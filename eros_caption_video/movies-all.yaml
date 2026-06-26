@@ -1,0 +1,843 @@
+'&JaraHatke':
+  frames_subdir: '&JaraHatke'
+  actors:
+  - Aakash
+  - Meera
+  - Aastha
+  actor_embedding_files:
+    Aakash: aakash.pkl
+    Meera: meera.pkl
+    Aastha: aastha.pkl
+  actor_display_names:
+    Aakash: Aakash
+    Meera: Meera
+    Aastha: Aastha
+10th_Class:
+  frames_subdir: 10th_Class
+  actors:
+  - Srinu
+  - Anjali
+  - Sandhya
+  actor_embedding_files:
+    Srinu: srinu.pkl
+    Anjali: anjali.pkl
+    Sandhya: sandhya.pkl
+  actor_display_names:
+    Srinu: Srinu
+    Anjali: Anjali
+    Sandhya: Sandhya
+16Vayathinile:
+  frames_subdir: 16Vayathinile
+  actors:
+  - Gopalakrishnan
+  - Parattaiyan
+  - Mayil
+  actor_embedding_files:
+    Gopalakrishnan: gopalakrishnan.pkl
+    Parattaiyan: parattaiyan.pkl
+    Mayil: mayil.pkl
+  actor_display_names:
+    Gopalakrishnan: Gopalakrishnan
+    Parattaiyan: Parattaiyan
+    Mayil: Mayil
+18-Apr:
+  frames_subdir: 18-Apr
+  actors:
+  - Sub Inspector Ravikumar
+  - Sobhana
+  actor_embedding_files:
+    Sub Inspector Ravikumar: sub_inspector_ravikumar.pkl
+    Sobhana: sobhana.pkl
+  actor_display_names:
+    Sub Inspector Ravikumar: Sub Inspector Ravikumar
+    Sobhana: Sobhana
+18.11-ACodeOfSecrecy:
+  frames_subdir: 18.11-ACodeOfSecrecy
+  actors:
+  - Rehal Khan
+  - Suhana
+  actor_embedding_files:
+    Rehal Khan: rehal_khan.pkl
+    Suhana: suhana.pkl
+  actor_display_names:
+    Rehal Khan: Rehal Khan
+    Suhana: Suhana
+18thCross:
+  frames_subdir: 18thCross
+  actors:
+  - Jeevan
+  - Punya
+  actor_embedding_files:
+    Jeevan: jeevan.pkl
+    Punya: punya.pkl
+  actor_display_names:
+    Jeevan: Jeevan
+    Punya: Punya
+'1921':
+  frames_subdir: '1921'
+  actors:
+  - Naik Khader
+  actor_embedding_files:
+    Naik Khader: naik_khader.pkl
+  actor_display_names:
+    Naik Khader: Naik Khader
+'1977':
+  frames_subdir: '1977'
+  actors:
+  - Rajashekar/ Vetrivel
+  - Inba
+  - Chandini
+  actor_embedding_files:
+    Rajashekar/ Vetrivel: rajashekar_vetrivel.pkl
+    Inba: inba.pkl
+    Chandini: chandini.pkl
+  actor_display_names:
+    Rajashekar/ Vetrivel: Rajashekar/ Vetrivel
+    Inba: Inba
+    Chandini: Chandini
+1990_KaliyugaVishwamitra:
+  frames_subdir: 1990_KaliyugaVishwamitra
+  actors:
+  - Budida Bhima Rao
+  - Vijayachandra
+  actor_embedding_files:
+    Budida Bhima Rao: budida_bhima_rao.pkl
+    Vijayachandra: vijayachandra.pkl
+  actor_display_names:
+    Budida Bhima Rao: Budida Bhima Rao
+    Vijayachandra: Vijayachandra
+# 24Hours:
+#   frames_subdir: 24Hours
+#   actors:
+#   - Jagan
+#   - Gauri
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Jagan: Jagan
+#     Gauri: Gauri
+24ManiNeram:
+  frames_subdir: 24ManiNeram
+  actors:
+  - Raj
+  - Janaki
+  actor_embedding_files:
+    Raj: raj.pkl
+    Janaki: janaki.pkl
+  actor_display_names:
+    Raj: Raj
+    Janaki: Janaki
+27MavalliCircle:
+  frames_subdir: 27MavalliCircle
+  actors:
+  - blind woman
+  actor_embedding_files:
+    blind woman: blind_woman.pkl
+  actor_display_names:
+    blind woman: blind woman
+3Bachelors:
+  frames_subdir: 3Bachelors
+  actors:
+  - Amit
+  - Jai
+  - Nisha
+  - Neha
+  actor_embedding_files:
+    Amit: amit.pkl
+    Nisha: nisha.pkl
+  actor_display_names:
+    Amit: Amit
+    Jai: Jai
+    Nisha: Nisha
+    Neha: Neha
+# 3 Char Sau Bees:
+#   frames_subdir: 3 Char Sau Bees
+#   actors:
+#   - Raghavan
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Raghavan: Raghavan
+3G:
+  frames_subdir: 3G
+  actors:
+  - Sam
+  - Sheena
+  actor_embedding_files:
+    Sheena: sheena.pkl
+  actor_display_names:
+    Sam: Sam
+    Sheena: Sheena
+3Moonu:
+  frames_subdir: 3Moonu
+  actors:
+  - Ramachandran
+  - Janu
+  actor_embedding_files: 
+    Ramachandran / Ram: Ramachandran.pkl
+    anani Ramachandran / Janu: Janu.pkl
+  actor_display_names:
+    Ramachandran / Ram: Ramachandran
+    anani Ramachandran / Janu: Janu
+'404ErrorNotFound':
+  frames_subdir: '404ErrorNotFound'
+  actors:
+  - Abhimanyu
+  - Professor Aniruddh
+  - Dr. Mira
+  actor_embedding_files:
+    Abhimanyu: abhimanyu.pkl
+    Professor Aniruddh: professor_aniruddh.pkl
+    Dr. Mira: dr_mira.pkl
+  actor_display_names:
+    Abhimanyu: Abhimanyu
+    Professor Aniruddh: Professor Aniruddh
+    Dr. Mira: Dr. Mira
+47Rojulu:
+  frames_subdir: 47Rojulu
+  actors:
+  - Kumar
+  - Vaishali
+  actor_embedding_files:
+    Kumar: rajkumari.pkl
+  actor_display_names:
+    Kumar: Kumar
+    Vaishali: Vaishali
+# 4 Boys:
+#   frames_subdir: 4 Boys
+#   actors:
+#   - Nandini
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Nandini: Nandini
+5_Rifles:
+  frames_subdir: 5_Rifles
+  actors:
+  - Rakesh Khanna
+  - Dacoit Raka
+  - Rajkumari / Khatari
+  actor_embedding_files:
+    Rakesh Khanna: rakesh_khanna.pkl
+    Dacoit Raka: dacoit_raka.pkl
+  actor_display_names:
+    Rakesh Khanna: Rakesh Khanna
+    Dacoit Raka: Dacoit Raka
+    Rajkumari / Khatari: Rajkumari / Khatari
+5GhanteyMein5Crore:
+  frames_subdir: 5GhanteyMein5Crore
+  actors:
+  - Vikram
+  - Karan Oberoi
+  - Soniya
+  actor_embedding_files:
+    Vikram: vikram.pkl
+    Karan Oberoi: karan_oberoi.pkl
+    Soniya: soniya.pkl
+  actor_display_names:
+    Vikram: Vikram
+    Karan Oberoi: Karan Oberoi
+    Soniya: Soniya
+AAI:
+  frames_subdir: AAI
+  actors:
+  - Sakthivelu / Velu
+  - Anjali
+  actor_embedding_files:
+    Anjali: anjali.pkl
+  actor_display_names:
+    Sakthivelu / Velu: Sakthivelu / Velu
+    Anjali: Anjali
+ABCD:
+  frames_subdir: ABCD
+  actors:
+  - Anandh
+  - Chandra
+  - Divya Daisy
+  actor_embedding_files:
+    Anandh: anandh.pkl
+    Chandra: chandra.pkl
+    Divya Daisy: divya_daisy.pkl
+  actor_display_names:
+    Anandh: Anandh
+    Chandra: Chandra
+    Divya Daisy: Divya Daisy
+AKKA:
+  frames_subdir: AKKA
+  actors:
+  - Malasri
+  actor_embedding_files:
+    Malasri: malasri.pkl
+  actor_display_names:
+    Malasri: Malasri
+ANDAM_KOSAM_PANDHEM:
+  frames_subdir: ANDAM_KOSAM_PANDHEM
+  actors:
+  - Madhavudu
+  - Malathi
+  actor_embedding_files:
+    Madhavudu: madhavudu.pkl
+  actor_display_names:
+    Madhavudu: Madhavudu
+    Malathi: Malathi
+ANNAMAYYA:
+  frames_subdir: ANNAMAYYA
+  actors:
+  - Annamayya
+  - Timmakka
+  - Akkalamma
+  actor_embedding_files:
+    Annamayya: annamayya.pkl
+    Timmakka: timmakka.pkl
+    Akkalamma: akkalamma.pkl
+  actor_display_names:
+    Annamayya: Annamayya
+    Timmakka: Timmakka
+    Akkalamma: Akkalamma
+# APPAYYA:
+#   frames_subdir: APPAYYA
+#   actors:
+#   - Appayya
+#   - Gowra
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Appayya: Appayya
+#     Gowra: Gowra
+# ARAMANA VEEDUM 500 EKKARAM:
+#   frames_subdir: ARAMANA VEEDUM 500 EKKARAM
+#   actors:
+#   - Kannappan
+#   - Alli
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Kannappan: Kannappan
+#     Alli: Alli
+ARUNARAGA:
+  frames_subdir: ARUNARAGA
+  actors:
+  - Sumesh
+  - Janaki
+  actor_embedding_files:
+    Sumesh: sumesh.pkl
+    Janaki: janaki.pkl
+  actor_display_names:
+    Sumesh: Sumesh
+    Janaki: Janaki
+# ASAMBHAVA:
+#   frames_subdir: ASAMBHAVA
+#   actors:
+#   - Veerabhadra
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Veerabhadra: Veerabhadra
+AaDekhenZara:
+  frames_subdir: AaDekhenZara
+  actors:
+  - Ray Acharya
+  - Captain
+  - Simi Chatterjee
+  - Bindiya Avasti
+  actor_embedding_files:
+    Captain: captain.pkl
+    Simi Chatterjee: simi_chatterjee.pkl
+    Bindiya Avasti: bindiya_avasti.pkl
+  actor_display_names:
+    Ray Acharya: Ray Acharya
+    Captain: Captain
+    Simi Chatterjee: Simi Chatterjee
+    Bindiya Avasti: Bindiya Avasti
+AaDivasam:
+  frames_subdir: AaDivasam
+  actors:
+  - Balachandran IPS
+  - Boss
+  actor_embedding_files:
+    Balachandran IPS: balachandran_ips.pkl
+    Boss: boss.pkl
+  actor_display_names:
+    Balachandran IPS: Balachandran IPS
+    Boss: Boss
+AaNeramAlppaDooram:
+  frames_subdir: AaNeramAlppaDooram
+  actors:
+  - Jameskutty
+  - Amminikutty
+  actor_embedding_files:
+    Jameskutty: jameskutty_aa_neram_alppa_dooram.pkl
+    Amminikutty: amminikutty_aa_neram_alppa_dooram.pkl
+  actor_display_names:
+    Jameskutty: Jameskutty
+    Amminikutty: Amminikutty
+# Aada Janma:
+#   frames_subdir: Aada Janma
+#   actors:
+#   - Devaki
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Devaki: Devaki
+Aadapettanam:
+  frames_subdir: Aadapettanam
+  actors:
+  - Krishna
+  - Radha
+  actor_embedding_files:
+    Krishna: krishna_aada_pettanam.pkl
+    Radha: radha_aada_pettanam.pkl
+  actor_display_names:
+    Krishna: Krishna
+    Radha: Radha
+AadarsaKutumbam:
+  frames_subdir: AadarsaKutumbam
+  actors:
+  - Prasad
+  - Saroja
+  actor_embedding_files:
+    Prasad: prasad_aadarsa_kutumbam.pkl
+    Saroja: saroja_aadarsa_kutumbam.pkl
+  actor_display_names:
+    Prasad: Prasad
+    Saroja: Saroja
+Aadhavan:
+  frames_subdir: Aadhavan
+  actors:
+  - Madhavan Subramaniam / Aadhavan
+  - Tara
+  actor_embedding_files:
+    Madhavan Subramaniam / Aadhavan: madhavan_subramaniam_aadhavan.pkl
+  actor_display_names:
+    Madhavan Subramaniam / Aadhavan: Madhavan Subramaniam / Aadhavan
+    Tara: Tara
+AadhiKesavan:
+  frames_subdir: AadhiKesavan
+  actors:
+  - Chennakesava Reddy  and Bharat
+  - Preethi
+  - Devi
+  actor_embedding_files:
+    Preethi: preethi_aadhi_kesavan.pkl
+    Devi: devi_aadhi_kesavan.pkl
+  actor_display_names:
+    Chennakesava Reddy  and Bharat: Chennakesava Reddy  and Bharat
+    Preethi: Preethi
+    Devi: Devi
+AadhyatheKanmani:
+  frames_subdir: AadhyatheKanmani
+  actors:
+  - Balachandran Unnithan
+  - Padmarajan
+  - Ambika
+  - Hema
+  actor_embedding_files:
+    Balachandran Unnithan: balachandran_unnithan_balu_aadhyathe_kanmani.pkl
+    Hema: hema_aadu_puli_attam.pkl
+  actor_display_names:
+    Balachandran Unnithan: Balachandran Unnithan
+    Padmarajan: Padmarajan
+    Ambika: Ambika
+    Hema: Hema
+AadmiAurApsara:
+  frames_subdir: AadmiAurApsara
+  actors:
+  - Raju
+  - Mahadrashta
+  - Indraja
+  actor_embedding_files:
+    Raju: raju_aadmi_aur_apsara.pkl
+    Mahadrashta: mahadrashta_aadmi_aur_apsara.pkl
+    Indraja: indraja_aadmi_aur_apsara.pkl
+  actor_display_names:
+    Raju: Raju
+    Mahadrashta: Mahadrashta
+    Indraja: Indraja
+AaduPuli:
+  frames_subdir: AaduPuli
+  actors:
+  - Idhayakanni Bhagyan
+  - Bhagyanathan
+  - Anjali Thillainayaga
+  actor_embedding_files:
+    Idhayakanni Bhagyan: idhayakanni_bhagyan_aadu_puli.pkl
+    Bhagyanathan: bhagyanathan_aadu_puli.pkl
+    Anjali Thillainayaga: anjali_thillainayaga_aadu_puli.pkl
+  actor_display_names:
+    Idhayakanni Bhagyan: Idhayakanni Bhagyan
+    Bhagyanathan: Bhagyanathan
+    Anjali Thillainayaga: Anjali Thillainayaga
+AaduPuliAttam:
+  frames_subdir: AaduPuliAttam
+  actors:
+  - Rajini
+  - Madhan
+  - Hema
+  - Mary
+  actor_embedding_files:
+    Rajini: rajini_aadu_puli_attam.pkl
+    Madhan: madhan_aadu_puli_attam.pkl
+    Hema: hema_aadu_puli_attam.pkl
+    Mary: mary_aadu_puli_attam.pkl
+  actor_display_names:
+    Rajini: Rajini
+    Madhan: Madhan
+    Hema: Hema
+    Mary: Mary
+AadyaKiranangal:
+  frames_subdir: AadyaKiranangal
+  actors:
+  - Kunjukutty
+  - Pappachan
+  - Marykutty
+  actor_embedding_files:
+    Kunjukutty: kunjukutty_aadya_kiranangal.pkl
+  actor_display_names:
+    Kunjukutty: Kunjukutty
+    Pappachan: Pappachan
+    Marykutty: Marykutty
+# Aadyathe Anuraagam:
+#   frames_subdir: Aadyathe Anuraagam
+#   actors:
+#   - Suresh
+#   - Syamala
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Suresh: Suresh
+#     Syamala: Syamala
+AagKeSholay:
+  frames_subdir: AagKeSholay
+  actors:
+  - Thakur Amar Singh
+  - Shankar
+  - Ganga
+  - Geeta
+  actor_embedding_files:
+    Thakur Amar Singh: thakur_amar_singh_aag_ke_sholay.pkl
+    Shankar: shankar_aag_ke_sholay.pkl
+    Ganga: ganga_aag_ke_sholay.pkl
+    Geeta: geeta_aag_ke_sholay.pkl
+  actor_display_names:
+    Thakur Amar Singh: Thakur Amar Singh
+    Shankar: Shankar
+    Ganga: Ganga
+    Geeta: Geeta
+AagaayaGangai:
+  frames_subdir: AagaayaGangai
+  actors:
+  - Murali
+  - Sumathi
+  actor_embedding_files:
+    Murali: murali_aagaaya_gangai.pkl
+    Sumathi: sumathi_aagaaya_gangai.pkl
+  actor_display_names:
+    Murali: Murali
+    Sumathi: Sumathi
+# Aagatha:
+#   frames_subdir: Aagatha
+#   actors:
+#   - Francis/Director
+#   - Usha
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Francis/Director: Francis/Director
+#     Usha: Usha
+# Aaghosham:
+#   frames_subdir: Aaghosham
+#   actors:
+#   - Ghee Varghese Ponnukkaran
+#   - Rex Issac Ponnukkaran
+#   - Elsa Thamban
+#   - Nancy Rex
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Ghee Varghese Ponnukkaran: Ghee Varghese Ponnukkaran
+#     Rex Issac Ponnukkaran: Rex Issac Ponnukkaran
+#     Elsa Thamban: Elsa Thamban
+#     Nancy Rex: Nancy Rex
+# Aaha Brahmachari:
+#   frames_subdir: Aaha Brahmachari
+#   actors:
+#   - Aarthi
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Aarthi: Aarthi
+# Aaj Aur Kal:
+#   frames_subdir: Aaj Aur Kal
+#   actors:
+#   - Dr. Sanjay
+#   - Maharaja Balbirsingh
+#   - Rajkumari Hemlata / Hema
+#   - Rajkumari Ashalata / Asha
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Dr. Sanjay: Dr. Sanjay
+#     Maharaja Balbirsingh: Maharaja Balbirsingh
+#     Rajkumari Hemlata / Hema: Rajkumari Hemlata / Hema
+#     Rajkumari Ashalata / Asha: Rajkumari Ashalata / Asha
+AajKaRavan:
+  frames_subdir: AajKaRavan
+  actors:
+  - Shankar
+  - Shanti
+  - Ramkali
+  actor_embedding_files:
+    Shankar: shankar_aaj_ka_ravan.pkl
+    Shanti: shanti_journalist_aaj_ka_ravan.pkl
+    Ramkali: ramkali_aaj_ka_ravan.pkl
+  actor_display_names:
+    Shankar: Shankar
+    Shanti: Shanti
+    Ramkali: Ramkali
+AakasameHaddu:
+  frames_subdir: AakasameHaddu
+  actors:
+  - Karthik
+  - Narayana
+  - Keerthi
+  actor_embedding_files:
+    Karthik: karthik_aakasame_haddu.pkl
+    Narayana: narayana_aakasame_haddu.pkl
+    Keerthi: keerthi_aakasame_haddu.pkl
+  actor_display_names:
+    Karthik: Karthik
+    Narayana: Narayana
+    Keerthi: Keerthi
+AakhriBadla:
+  frames_subdir: AakhriBadla
+  actors:
+  - Himadhri Choudhry
+  - Leena P. Saigol
+  actor_embedding_files:
+    Himadhri Choudhry: himadhri_choudhry_aakhri_badla.pkl
+    Leena P. Saigol: leena_p_saigol_aakhri_badla.pkl
+  actor_display_names:
+    Himadhri Choudhry: Himadhri Choudhry
+    Leena P. Saigol: Leena P. Saigol
+AakhriDeal:
+  frames_subdir: AakhriDeal
+  actors:
+  - Karan
+  actor_embedding_files:
+    Karan: karan_oberoi.pkl
+  actor_display_names:
+    Karan: Karan
+AakhriGhulam:
+  frames_subdir: AakhriGhulam
+  actors:
+  - Bheema
+  - Sonam Singh
+  actor_embedding_files:
+    Bheema: bheema_aakhri_ghulam.pkl
+    Sonam Singh: sonam_singh_aakhri_ghulam.pkl
+  actor_display_names:
+    Bheema: Bheema
+    Sonam Singh: Sonam Singh
+AakhriSajda:
+  frames_subdir: AakhriSajda
+  actors:
+  - Akbar
+  - Jennie
+  actor_embedding_files:
+    Akbar: akbar_aakhri_sajda.pkl
+    Jennie: jennie_akbar_s_wife_aakhri_sajda.pkl
+  actor_display_names:
+    Akbar: Akbar
+    Jennie: Jennie
+Aakrosham:
+  frames_subdir: Aakrosham
+  actors:
+  - Commissioner Rajashekharan Thambi
+  - Mohanachandran
+  - Prabha Rajashekharan Thambi
+  - Nirmala
+  actor_embedding_files:
+    Mohanachandran: mohanachandran_aakrosham.pkl
+    Prabha Rajashekharan Thambi: prabha_rajashekharan_thambi_aakrosham.pkl
+    Nirmala: nirmala_aakrosham.pkl
+  actor_display_names:
+    Commissioner Rajashekharan Thambi: Commissioner Rajashekharan Thambi
+    Mohanachandran: Mohanachandran
+    Prabha Rajashekharan Thambi: Prabha Rajashekharan Thambi
+    Nirmala: Nirmala
+# Aalapiranthavan:
+#   frames_subdir: Aalapiranthavan
+#   actors:
+#   - Duraiarasan / Aalappirandhavan
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Duraiarasan / Aalappirandhavan: Duraiarasan / Aalappirandhavan
+Aalayamani:
+  frames_subdir: Aalayamani
+  actors:
+  - Thyagarajan / Thyagu
+  - Meena / Vanampadi
+  actor_embedding_files:
+    Thyagarajan / Thyagu: thyagarajan_thyagu_aalayamani.pkl
+  actor_display_names:
+    Thyagarajan / Thyagu: Thyagarajan / Thyagu
+    Meena / Vanampadi: Meena / Vanampadi
+Aalvar:
+  frames_subdir: Aalvar
+  actors:
+  - Aalwar aka 'Mortuary' / Shiva
+  - Priya
+  actor_embedding_files:
+    Priya: priya_aalvar.pkl
+  actor_display_names:
+    Aalwar aka 'Mortuary' / Shiva: Aalwar aka 'Mortuary' / Shiva
+    Priya: Priya
+Aan:
+  frames_subdir: Aan
+  actors:
+  - Jai Tilak
+  - Princess Rajeshwari/Rajshree
+  - Mangala
+  actor_embedding_files:
+    Jai Tilak: jai_tilak_aan.pkl
+  actor_display_names:
+    Jai Tilak: Jai Tilak
+    Princess Rajeshwari/Rajshree: Princess Rajeshwari/Rajshree
+    Mangala: Mangala
+AanPaavam:
+  frames_subdir: AanPaavam
+  actors:
+  - Periya Paandi
+  - Chinna Paandi
+  - Revathi
+  - Seetha
+  actor_embedding_files:
+    Periya Paandi: periya_paandi_aan_paavam.pkl
+    Chinna Paandi: chinna_paandi_aan_paavam.pkl
+    Revathi: revathi_aan_paavam.pkl
+    Seetha: seetha_aan_paavam.pkl
+  actor_display_names:
+    Periya Paandi: Periya Paandi
+    Chinna Paandi: Chinna Paandi
+    Revathi: Revathi
+    Seetha: Seetha
+Aanakkorumma:
+  frames_subdir: Aanakkorumma
+  actors:
+  - Devi
+  - Anitha
+  actor_embedding_files:
+    Devi: devi_aanakkorumma.pkl
+    Anitha: anitha_aanakkorumma.pkl
+  actor_display_names:
+    Devi: Devi
+    Anitha: Anitha
+Aanavakkari:
+  frames_subdir: Aanavakkari
+  actors:
+  - Shankar
+  - Maya
+  - Radhika
+  actor_embedding_files:
+    Shankar: shankar_aanavakkari.pkl
+    Maya: maya_aanavakkari.pkl
+    Radhika: hari_aaradhika.pkl
+  actor_display_names:
+    Shankar: Shankar
+    Maya: Maya
+    Radhika: Radhika
+Aapadbandhavudu:
+  frames_subdir: Aapadbandhavudu
+  actors:
+  - Madhava
+  - Hema
+  actor_embedding_files:
+    Madhava: madhava_aapadbandhavudu.pkl
+    Hema: hema_aapadbandhavudu.pkl
+  actor_display_names:
+    Madhava: Madhava
+    Hema: Hema
+AaradaGaaya:
+  frames_subdir: AaradaGaaya
+  actors:
+  - Mohan
+  - Meena
+  actor_embedding_files:
+    Mohan: mohan_a_press_reporter_aarada_gaaya.pkl
+    Meena: meena_aarada_gaaya.pkl
+  actor_display_names:
+    Mohan: Mohan
+    Meena: Meena
+Aaradhana:
+  frames_subdir: Aaradhana
+  actors:
+  - Gopi
+  - Radha
+  actor_embedding_files:
+    Gopi: gopi_aaradhana.pkl
+    Radha: radha_aaradhana.pkl
+  actor_display_names:
+    Gopi: Gopi
+    Radha: Radha
+Aaradhane:
+  frames_subdir: Aaradhane
+  actors:
+  - Rajesh
+  - Geeta
+  actor_embedding_files:
+    Rajesh: rajesh_aaradhane.pkl
+    Geeta: geeta_aaradhane.pkl
+  actor_display_names:
+    Rajesh: Rajesh
+    Geeta: Geeta
+Aaradhika:
+  frames_subdir: Aaradhika
+  actors:
+  - Hari
+  - Hema
+  actor_embedding_files:
+    Hari: hari_aaradhika.pkl
+    Hema: hema_aaradhika.pkl
+  actor_display_names:
+    Hari: Hari
+    Hema: Hema
+Aarakshaka:
+  frames_subdir: Aarakshaka
+  actors:
+  - Arun Kumar and Vishnu
+  - Dr. Nandini
+  - Catherine
+  actor_embedding_files:
+    Dr. Nandini: dr_nandini_aarakshaka.pkl
+    Catherine: catherine_aarakshaka.pkl
+  actor_display_names:
+    Arun Kumar and Vishnu: Arun Kumar and Vishnu
+    Dr. Nandini: Dr. Nandini
+    Catherine: Catherine
+Aaravam:
+  frames_subdir: Aaravam
+  actors:
+  - Maruthu
+  - Kaveri
+  actor_embedding_files:
+    Maruthu: maruthu_aaravam.pkl
+    Kaveri: kaveri_aaravam.pkl
+  actor_display_names:
+    Maruthu: Maruthu
+    Kaveri: Kaveri
+Aaru:
+  frames_subdir: Aaru
+  actors:
+  - Aarumugam / Aaru
+  - Mahalakshmi
+  actor_embedding_files:
+    Mahalakshmi: mahalakshmi_aaru.pkl
+  actor_display_names:
+    Aarumugam / Aaru: Aarumugam / Aaru
+    Mahalakshmi: Mahalakshmi
+# Aaru Mooru Ombhatthu:
+#   frames_subdir: Aaru Mooru Ombhatthu
+#   actors:
+#   - Suryanarayana Bhatta
+#   - Kamalabai
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Suryanarayana Bhatta: Suryanarayana Bhatta
+#     Kamalabai: Kamalabai
+# Aarum Anyaralla:
+#   frames_subdir: Aarum Anyaralla
+#   actors:
+#   - Prabhakaran
+#   - Gracy
+#   actor_embedding_files: {}
+#   actor_display_names:
+#     Prabhakaran: Prabhakaran
+#     Gracy: Gracy

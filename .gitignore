@@ -1,0 +1,28 @@
+# Large data — exclude except v3_outputs_dense (included intentionally)
+models/
+v2_outputs/
+v3_outputs/
+pipeline_outputs/
+motion_filtering_v1_outputs/
+srk_clips/
+.prompt_cache_*/
+
+# Nested git repos (removed before monorepo push)
+**/.git/
+
+# Python / env
+__pycache__/
+*.pyc
+.env
+.venv/
+*.egg-info/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Logs / scratch (keep v3_outputs_dense scratch JSON)
+Indic_video_pipeline/workspaces/
+Indic_video_pipeline/logs/
+v3_outputs_dense/

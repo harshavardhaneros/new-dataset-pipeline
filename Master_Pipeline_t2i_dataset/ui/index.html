@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eros Universe — Indic Cultural Image Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #06060C; --surface: #0D0D18; --elevated: #1A1A2E; --card: rgba(16,16,30,0.7);
+    --lime: #A9E027; --lime-dark: #8BC920; --cyan: #00A2FF; --cyan-dark: #0088CC;
+    --success: #00E676; --running: #00A2FF; --warning: #FFB020; --error: #FF3D71;
+    --text: #F0F0FF; --text2: #A0A0C0; --text3: #606080;
+    --border: rgba(255,255,255,0.06); --glow: rgba(169,224,39,0.15);
+    --gradient: linear-gradient(135deg, #A9E027 0%, #00A2FF 100%);
+    --radius: 14px; --radius-sm: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+::selection { background:rgba(169,224,39,0.3); color:#fff; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+#canvas-background { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.5; }
+.mesh-gradient {
+    position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none;
+    background: radial-gradient(ellipse at 15% 50%, rgba(169,224,39,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 50%, rgba(0,162,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(100,50,200,0.06) 0%, transparent 50%);
+}
+.header {
+    position:sticky; top:0; z-index:100; height:68px;
+    background:rgba(6,6,12,0.92); backdrop-filter:blur(24px) saturate(180%);
+    border-bottom:1px solid var(--border); transition:all 0.35s;
+}
+.header-container { max-width:1440px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:100%; }
+.logo { font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+.logo span { background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.logo small { color:var(--cyan); font-size:13px; font-weight:600; margin-left:8px; }
+.nav-menu { display:flex; gap:4px; list-style:none; }
+.nav-link {
+    display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:var(--radius-sm);
+    color:var(--text2); text-decoration:none; font-size:13px; font-weight:500; transition:all 0.2s; position:relative; cursor:pointer;
+}
+.nav-link:hover { color:var(--text); background:rgba(169,224,39,0.06); }
+.nav-link:hover svg { color:var(--lime); }
+.nav-link.active { color:var(--lime); background:rgba(169,224,39,0.1); font-weight:600; }
+.nav-link.active::after { content:''; position:absolute; bottom:-1px; left:20%; right:20%; height:2px; background:var(--gradient); border-radius:2px; }
+.nav-link svg { width:16px; height:16px; transition:color 0.2s; }
+.status-pill { padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; letter-spacing:0.5px; }
+.status-idle { background:var(--elevated); color:var(--text2); }
+.status-running { background:rgba(0,162,255,0.15); color:var(--cyan); border:1px solid rgba(0,162,255,0.3); animation:pulse 2s infinite; }
+.status-done { background:rgba(0,230,118,0.15); color:var(--success); border:1px solid rgba(0,230,118,0.3); }
+.status-error { background:rgba(255,61,113,0.15); color:var(--error); border:1px solid rgba(255,61,113,0.3); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+main { position:relative; z-index:2; max-width:1440px; margin:0 auto; padding:32px; min-height:calc(100vh - 68px - 60px); }
+.card {
+    background:var(--card); backdrop-filter:blur(20px) saturate(150%);
+    border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px; margin-bottom:20px; position:relative; overflow:hidden; transition:all 0.35s;
+}
+.card:hover { border-color:rgba(169,224,39,0.12); box-shadow:0 8px 40px rgba(0,0,0,0.3); transform:translateY(-2px); }
+.card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(169,224,39,0.3), rgba(0,162,255,0.3), transparent);
+    opacity:0; transition:opacity 0.3s;
+}
+.card:hover::before { opacity:1; }
+.card-title {
+    font-size:11px; text-transform:uppercase; letter-spacing:2px; font-weight:700;
+    color:var(--lime); margin-bottom:20px; display:flex; align-items:center; gap:8px;
+}
+.card-title svg { width:14px; height:14px; }
+.format-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.format-card {
+    background:var(--elevated); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px 16px; text-align:center; cursor:default; transition:all 0.3s;
+}
+.format-card:hover { border-color:var(--lime); transform:translateY(-4px); box-shadow:0 8px 32px var(--glow); }
+.format-icon { font-size:36px; margin-bottom:12px; }
+.format-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.format-desc { font-size:11px; color:var(--text2); line-height:1.5; }
+.format-example {
+    margin-top:12px; background:var(--bg); border-radius:6px; padding:8px 12px;
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); text-align:left; line-height:1.6;
+}
+.input-group { margin-bottom:16px; }
+.input-label { display:block; font-size:12px; font-weight:600; color:var(--text2); margin-bottom:6px; letter-spacing:0.5px; }
+.input-hint { font-size:11px; color:var(--text3); margin-top:4px; }
+input[type=text], input[type=number], input[type=password], select, textarea {
+    width:100%; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
+    color:var(--text); padding:10px 14px; font-size:13px; font-family:'Inter',sans-serif; transition:border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--lime); box-shadow:0 0 0 3px var(--glow); }
+.input-row { display:flex; gap:8px; align-items:end; margin-bottom:8px; }
+.input-row input { flex:1; }
+.btn {
+    padding:10px 24px; border:none; border-radius:var(--radius-sm); cursor:pointer;
+    font-weight:700; font-size:13px; font-family:'Inter',sans-serif; transition:all 0.2s;
+    display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary { background:var(--gradient); color:#06060C; }
+.btn-primary:hover { transform:translateY(-2px) scale(1.02); box-shadow:0 8px 40px rgba(169,224,39,0.4); }
+.btn-gold { background:linear-gradient(135deg,var(--cyan),var(--cyan-dark)); color:#fff; }
+.btn-gold:hover { transform:translateY(-2px); box-shadow:0 4px 20px rgba(0,162,255,0.3); }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--text2); }
+.btn-outline:hover { border-color:var(--text); color:var(--text); }
+.btn-sm { padding:6px 14px; font-size:11px; }
+.btn-danger { background:rgba(255,61,113,0.1); color:var(--error); border:1.5px solid rgba(255,61,113,0.25); }
+.btn-danger:hover { background:rgba(255,61,113,0.2); border-color:var(--error); transform:translateY(-2px); }
+.btn:disabled { opacity:0.4; cursor:not-allowed; transform:none!important; }
+.gpu-rack { display:grid; grid-template-columns:repeat(8,1fr); gap:10px; margin:20px 0; }
+.gpu-card {
+    background:var(--elevated); border:2px solid var(--border); border-radius:var(--radius);
+    padding:16px 8px; text-align:center; transition:all 0.3s; position:relative;
+}
+.gpu-card.active { box-shadow:0 0 20px var(--glow); }
+.gpu-card .gpu-num { font-size:10px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+.gpu-card .gpu-role { font-size:12px; font-weight:800; margin:6px 0; min-height:18px; }
+.gpu-card .gpu-model { font-size:9px; color:var(--text3); min-height:14px; }
+.gpu-card.vllm { border-color:var(--lime); }
+.gpu-card.vllm .gpu-role { color:var(--lime); }
+.gpu-card.actor { border-color:var(--success); }
+.gpu-card.actor .gpu-role { color:var(--success); }
+.gpu-card.clip { border-color:var(--cyan); }
+.gpu-card.clip .gpu-role { color:var(--cyan); }
+.gpu-card.wm { border-color:var(--warning); }
+.gpu-card.wm .gpu-role { color:var(--warning); }
+.gpu-card.free { border-color:var(--border); opacity:0.4; }
+.gpu-bar { height:4px; background:var(--border); border-radius:2px; margin-top:8px; }
+.gpu-bar-fill { height:100%; border-radius:2px; }
+.settings-locked { position:relative; }
+.settings-overlay {
+    position:absolute; top:0; left:0; right:0; bottom:0; z-index:10;
+    background:rgba(6,6,12,0.8); backdrop-filter:blur(4px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:var(--radius); gap:12px;
+}
+.settings-overlay svg { width:32px; height:32px; color:var(--lime); }
+.settings-overlay p { color:var(--text2); font-size:13px; }
+.slider-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.slider-row label { min-width:140px; flex-shrink:0; font-size:12px; color:var(--text2); }
+.slider-row input[type=range] { flex:1; accent-color:var(--lime); height:4px; }
+.slider-row .slider-val { min-width:50px; text-align:right; color:var(--lime); font-weight:700; font-family:'JetBrains Mono',monospace; font-size:13px; background:rgba(169,224,39,0.1); padding:2px 8px; border-radius:100px; }
+.toggle { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.toggle input[type=checkbox] { accent-color:var(--lime); width:18px; height:18px; }
+.toggle label { font-size:13px; color:var(--text2); cursor:pointer; }
+.dag { display:flex; align-items:center; gap:6px; padding:20px 0; overflow-x:auto; }
+.dag-node {
+    background:var(--elevated); border:2px solid var(--border); border-radius:var(--radius-sm);
+    padding:12px 18px; text-align:center; min-width:90px; transition:all 0.3s;
+}
+.dag-node.done { border-color:var(--lime); background:rgba(169,224,39,0.08); }
+.dag-node.done .dag-icon { color:var(--lime); }
+.dag-node.active { border-color:var(--cyan); animation:pulse 2s infinite; background:rgba(0,162,255,0.08); }
+.dag-node.active .dag-icon { color:var(--cyan); }
+.dag-node.pending { opacity:0.3; }
+.dag-icon { font-size:16px; }
+.dag-name { font-size:11px; font-weight:700; margin-top:4px; }
+.dag-arrow { color:var(--text3); font-size:14px; }
+.progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin:16px 0; }
+.progress-fill { height:100%; background:var(--gradient); border-radius:3px; transition:width 0.5s; position:relative; }
+.log-box {
+    background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:16px; max-height:350px; overflow-y:auto;
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); line-height:1.7;
+}
+.preview-modal {
+    display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:200;
+    background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); justify-content:center; align-items:center;
+}
+.preview-modal.open { display:flex; }
+.preview-content {
+    background:rgba(16,16,30,0.95); border:1px solid var(--border); border-radius:16px;
+    max-width:700px; width:90%; max-height:85vh; overflow-y:auto; padding:32px;
+}
+.preview-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+.preview-row .label { color:var(--text2); font-size:13px; }
+.preview-row .value { font-weight:600; font-size:13px; }
+.preview-row .ok { color:var(--success); }
+.preview-row .warn { color:var(--warning); }
+.preview-row .err { color:var(--error); }
+.preview-row .value code { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--bg); padding:2px 8px; border-radius:4px; }
+.stats { display:flex; flex-wrap:wrap; gap:12px; margin:16px 0; }
+.stat { background:var(--elevated); padding:16px 24px; border-radius:var(--radius); text-align:center; min-width:110px; border:1px solid var(--border); }
+.stat b { display:block; font-size:28px; font-weight:800; background:var(--gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.stat small { color:var(--text2); font-size:11px; letter-spacing:0.5px; }
+.section { display:none; animation:fadeIn 0.3s ease; }
+.section.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.footer {
+    position:relative; z-index:2; text-align:center; padding:20px 32px;
+    border-top:1px solid var(--border); color:var(--text3); font-size:12px;
+}
+.footer-tech { display:flex; justify-content:center; gap:16px; margin-top:6px; }
+.footer-tech span { display:flex; align-items:center; gap:4px; }
+.footer-tech svg { width:12px; height:12px; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table th { text-align:left; padding:10px 12px; color:var(--text3); font-size:11px; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid var(--border); }
+.data-table td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.03); font-size:13px; }
+.data-table td input, .data-table td select { width:100%; }
+@media(max-width:900px) { .format-grid{grid-template-columns:repeat(2,1fr)} .gpu-rack{grid-template-columns:repeat(4,1fr)} }
+</style>
+</head>
+<body>
+<canvas id="canvas-background"></canvas>
+<div class="mesh-gradient"></div>
+<header class="header">
+    <div class="header-container">
+        <div class="logo"><span>EROS</span> Universe <small>Image Pipeline</small></div>
+        <nav>
+            <ul class="nav-menu">
+                <li><a class="nav-link active" onclick="nav('input')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Input</span></a></li>
+                <li><a class="nav-link" onclick="nav('gpu')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg><span>GPUs</span></a></li>
+                <li><a class="nav-link" onclick="nav('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></a></li>
+                <li><a class="nav-link" onclick="nav('run')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Run</span></a></li>
+                <li><a class="nav-link" onclick="nav('results')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Results</span></a></li>
+            </ul>
+        </nav>
+        <span class="status-pill status-idle" id="status-badge">IDLE</span>
+    </div>
+</header>
+<main>
+<!-- 1. INPUT -->
+<div class="section active" id="sec-input">
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>SUPPORTED INPUT FORMATS</div>
+        <div class="format-grid">
+            <div class="format-card"><div class="format-icon">&#128253;</div><div class="format-name">Video Folders</div><div class="format-desc">Bollywood movies, YouTube downloads. Frames auto-extracted via scene detection.</div><div class="format-example">videos/<br>&nbsp;&nbsp;film1.mp4<br>&nbsp;&nbsp;film2.mkv<br><br>Formats: .mp4 .mkv .webm .avi .mov .flv</div></div>
+            <div class="format-card"><div class="format-icon">&#128444;</div><div class="format-name">Image Folders</div><div class="format-desc">Raw images from datasets. Scanned recursively for all supported formats.</div><div class="format-example">images/<br>&nbsp;&nbsp;photo_001.jpg<br>&nbsp;&nbsp;photo_002.png<br>&nbsp;&nbsp;photo_003.webp<br><br>Formats: .jpg .jpeg .png .webp .bmp</div></div>
+            <div class="format-card"><div class="format-icon">&#128221;</div><div class="format-name">Image + Text Pairs</div><div class="format-desc">Images with paired .txt files containing cultural labels (biryani, lehenga, etc).</div><div class="format-example">dataset/<br>&nbsp;&nbsp;000001.jpg<br>&nbsp;&nbsp;000001.txt &larr; "biryani"<br>&nbsp;&nbsp;000002.jpg<br>&nbsp;&nbsp;000002.txt &larr; "lehenga"<br><br>Label must be &le;100 characters</div></div>
+            <div class="format-card"><div class="format-icon">&#128203;</div><div class="format-name">CSV Movie List</div><div class="format-desc">CSV file listing paths with source types. Most flexible input method.</div><div class="format-example">path,source_type<br>/data/film.mp4,youtube<br>/data/photos/,internal<br>/data/labeled/,precaptioned<br><br>Types: youtube internal external<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;huggingface precaptioned</div></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>VIDEO SOURCES</div>
+        <div id="video-dirs"><div class="input-row"><input type="text" placeholder="/path/to/videos/ (Bollywood movies, YouTube downloads)" class="vdir"><button class="btn btn-outline btn-sm" onclick="this.parentElement.remove()">×</button></div></div>
+        <button class="btn btn-outline btn-sm" onclick="addRow('video-dirs','vdir','/path/to/more/videos/')">+ Add Video Folder</button>
+    </div>
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>IMAGE DATASETS</div>
+        <table class="data-table"><thead><tr><th>Folder Path</th><th style="width:150px">Source Type</th><th style="width:40px"></th></tr></thead>
+            <tbody id="img-dirs"><tr><td><input type="text" placeholder="/path/to/images/ (with optional .txt pairs)" class="idir-path"></td><td><select class="idir-type"><option>internal</option><option>external</option><option>huggingface</option><option>precaptioned</option></select></td><td><button class="btn btn-outline btn-sm" onclick="this.closest('tr').remove()">×</button></td></tr></tbody>
+        </table>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addImgRow()">+ Add Dataset</button>
+    </div>
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>OUTPUT &amp; MODEL</div>
+        <div class="input-group"><label class="input-label">Output Directory *</label><input type="text" id="work-dir" placeholder="/data/runs/run_001"><div class="input-hint">All pipeline outputs will be saved here</div></div>
+        <div class="input-group"><label class="input-label">VLM Model Path</label><input type="text" id="model-path" value="/data/kl_dev/models/Qwen2.5-VL-32B-Instruct"><div class="input-hint">Qwen2.5-VL-32B-Instruct (BF16)</div></div>
+    </div>
+</div>
+<!-- 2. GPU -->
+<div class="section" id="sec-gpu">
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>GPU ALLOCATION</div>
+        <div class="gpu-rack" id="gpu-rack"></div>
+        <div style="margin-top:16px;display:flex;gap:8px;align-items:center">
+            <label class="input-label" style="margin:0">Preset:</label>
+            <select id="gpu-preset" onchange="applyPreset(this.value)" style="width:180px">
+                <option value="8h100">8× H100 (Full)</option>
+                <option value="4gpu">4× GPU</option>
+                <option value="3gpu">3× GPU (0-2)</option>
+                <option value="2gpu">2× GPU</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="refreshGPU()">Refresh Live Status</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+            <div class="input-group"><label class="input-label">vLLM GPUs (comma-separated)</label><input type="text" id="vllm-gpus" value="0,1,2,3"></div>
+            <div class="input-group"><label class="input-label">Actor Tagger GPU</label><input type="number" id="actor-gpu" value="4" min="0" max="7"></div>
+            <div class="input-group"><label class="input-label">CLIP Scorer GPU</label><input type="number" id="clip-gpu" value="5" min="0" max="7"></div>
+            <div class="input-group"><label class="input-label">Watermark (LaMA) GPU</label><input type="number" id="wm-gpu" value="7" min="0" max="7"></div>
+        </div>
+    </div>
+</div>
+<!-- 3. SETTINGS -->
+<div class="section" id="sec-settings">
+    <div class="card settings-locked">
+        <div class="settings-overlay" id="settings-lock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <p>Settings locked. Enter password to modify.</p>
+            <input type="password" id="settings-pw" placeholder="Password" style="width:200px;text-align:center" onkeydown="if(event.key==='Enter')unlockSettings()">
+            <button class="btn btn-primary btn-sm" onclick="unlockSettings()">Unlock</button>
+        </div>
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>PIPELINE SETTINGS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+            <div>
+                <h4 style="font-size:12px;color:var(--lime);margin-bottom:12px;letter-spacing:1px">SCENE DETECTION</h4>
+                <div class="slider-row"><label>Scene Threshold</label><input type="range" id="s-scene" min="15" max="45" step="0.5" value="27" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">27</span></div>
+                <div class="slider-row"><label>Frames/Scene</label><input type="range" id="s-fps" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">3</span></div>
+                <h4 style="font-size:12px;color:var(--lime);margin-bottom:12px;margin-top:20px;letter-spacing:1px">DEDUPLICATION</h4>
+                <div class="slider-row"><label>Intra-video (≤)</label><input type="range" id="s-dedup-i" min="2" max="14" value="8" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">8</span></div>
+                <div class="slider-row"><label>Cross-source (≤)</label><input type="range" id="s-dedup-c" min="2" max="10" value="6" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">6</span></div>
+            </div>
+            <div>
+                <h4 style="font-size:12px;color:var(--lime);margin-bottom:12px;letter-spacing:1px">SCORING &amp; GATE</h4>
+                <div class="slider-row"><label>CLIP Weight</label><input type="range" id="s-clip-w" min="0" max="1" step="0.05" value="0.55" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.55</span></div>
+                <div class="slider-row"><label>AOD Weight</label><input type="range" id="s-aod-w" min="0" max="1" step="0.05" value="0.45" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.45</span></div>
+                <div class="slider-row"><label>Gate Final ≥</label><input type="range" id="s-gate-f" min="0.1" max="0.5" step="0.01" value="0.25" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.25</span></div>
+                <div class="slider-row"><label>Gate Review ≥</label><input type="range" id="s-gate-r" min="0.05" max="0.3" step="0.01" value="0.15" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.15</span></div>
+                <h4 style="font-size:12px;color:var(--lime);margin-bottom:12px;margin-top:20px;letter-spacing:1px">FEATURES</h4>
+                <div class="toggle"><input type="checkbox" id="s-wm-on" checked><label for="s-wm-on">Watermark Detection (VLM+LaMA+YOLO)</label></div>
+                <div class="slider-row"><label>WM Detect Thresh</label><input type="range" id="s-wm-det" min="0.2" max="0.7" step="0.05" value="0.45" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.45</span></div>
+                <div class="toggle"><input type="checkbox" id="s-crop" checked><label for="s-crop">Crop Letterbox Borders</label></div>
+                <div class="toggle"><input type="checkbox" id="s-actors" checked><label for="s-actors">Actor Recognition (112 Bollywood)</label></div>
+                <div class="slider-row"><label>Actor Similarity ≥</label><input type="range" id="s-actor-sim" min="0.2" max="0.6" step="0.01" value="0.35" oninput="this.nextElementSibling.textContent=this.value"><span class="slider-val">0.35</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 4. RUN -->
+<div class="section" id="sec-run">
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>PIPELINE EXECUTION</div>
+        <div class="dag" id="dag"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <p style="font-size:12px;color:var(--text3);margin-bottom:16px">Configure inputs and click Start</p>
+        <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" id="btn-start" onclick="startPipeline()">Start Pipeline</button>
+            <button class="btn btn-danger" id="btn-stop" onclick="stopPipeline()" disabled>Stop</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>LIVE LOGS</div>
+        <div class="log-box" id="log-box">Pipeline output will appear here when you start a run...</div>
+    </div>
+</div>
+<!-- 5. RESULTS -->
+<div class="section" id="sec-results">
+    <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>PIPELINE RESULTS</div>
+        <div class="stats" id="result-stats">
+            <div class="stat"><b>—</b><small>Scored</small></div>
+            <div class="stat"><b>—</b><small>Final</small></div>
+            <div class="stat"><b>—</b><small>Review</small></div>
+            <div class="stat"><b>—</b><small>Discard</small></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-outline" onclick="loadResults()">Refresh</button>
+        </div>
+    </div>
+</div>
+</main>
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="preview-modal">
+    <div class="preview-content">
+        <h3 style="font-size:16px;margin-bottom:20px;color:var(--lime)">Pre-Run Validation</h3>
+        <div id="preview-body"></div>
+        <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end">
+            <button class="btn btn-outline" onclick="closePreview()">Cancel</button>
+            <button class="btn btn-primary" id="btn-confirm" onclick="confirmStart()">Confirm &amp; Start</button>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700">EROS UNIVERSE</div>
+    <div style="margin-top:4px">Indic Cultural Image Pipeline</div>
+    <div class="footer-tech">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Qwen2.5-VL</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>YOLO + InsightFace</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>CLIP + LaMA</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>vLLM Streaming</span>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function(){
+    const canvas = document.getElementById('canvas-background');
+    if(!canvas||typeof THREE==='undefined')return;
+    const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    const geo=new THREE.BufferGeometry(),count=800,pos=new Float32Array(count*3);
+    for(let i=0;i<count*3;i++)pos[i]=(Math.random()-0.5)*20;
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    const mat=new THREE.PointsMaterial({color:0xA9E027,size:0.02,transparent:true,opacity:0.4,blending:THREE.AdditiveBlending});
+    scene.add(new THREE.Points(geo,mat));camera.position.z=10;
+    (function animate(){requestAnimationFrame(animate);scene.rotation.y+=0.0003;renderer.render(scene,camera)})();
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+})();
+const STEPS=['Discover','Extract','Dedup','Watermark','Classify','Actors','Caption','Score','Export'];
+function nav(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById('sec-'+id).classList.add('active');document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));event.target.closest('.nav-link').classList.add('active');}
+function addRow(containerId,cls,placeholder){const c=document.getElementById(containerId);const d=document.createElement('div');d.className='input-row';d.innerHTML=`<input type="text" placeholder="${placeholder}" class="${cls}"><button class="btn btn-outline btn-sm" onclick="this.parentElement.remove()">×</button>`;c.appendChild(d);}
+function addImgRow(){const tb=document.getElementById('img-dirs');const tr=document.createElement('tr');tr.innerHTML='<td><input type="text" placeholder="/path/to/images/" class="idir-path"></td><td><select class="idir-type"><option>internal</option><option>external</option><option>huggingface</option><option>precaptioned</option></select></td><td><button class="btn btn-outline btn-sm" onclick="this.closest(\'tr\').remove()">×</button></td>';tb.appendChild(tr);}
+function renderGPU(){
+    const rack=document.getElementById('gpu-rack');
+    const v=document.getElementById('vllm-gpus').value.split(',').map(Number);
+    const a=parseInt(document.getElementById('actor-gpu').value);
+    const c=parseInt(document.getElementById('clip-gpu').value);
+    const w=parseInt(document.getElementById('wm-gpu').value);
+    const map={};
+    v.forEach(g=>{map[g]={r:'vLLM',c:'vllm',m:'Qwen TP='+v.length}});
+    map[a]=map[a]||{r:'Actor',c:'actor',m:'YOLO+IF'};
+    map[c]={r:'CLIP#1',c:'clip',m:'ViT-L/14'};
+    if(!map[c+1])map[c+1]={r:'CLIP#2',c:'clip',m:'ViT-L/14'};
+    map[w]=map[w]||{r:'LaMA',c:'wm',m:'Watermark'};
+    rack.innerHTML='';
+    for(let i=0;i<8;i++){
+        const g=map[i]||{r:'Free',c:'free',m:''};
+        rack.innerHTML+=`<div class="gpu-card ${g.c} active"><div class="gpu-num">GPU ${i}</div><div class="gpu-role">${g.r}</div><div class="gpu-model">${g.m}</div><div class="gpu-bar"><div class="gpu-bar-fill" style="width:0%;background:var(--${g.c==='vllm'?'lime':g.c==='actor'?'success':g.c==='clip'?'cyan':'warning'})"></div></div></div>`;
+    }
+}
+function applyPreset(v){
+    const p={'8h100':{v:'0,1,2,3',a:4,c:5,w:7},'4gpu':{v:'0,1',a:2,c:3,w:3},'3gpu':{v:'0,1',a:2,c:2,w:2},'2gpu':{v:'0',a:1,c:1,w:1}}[v];
+    if(p){document.getElementById('vllm-gpus').value=p.v;document.getElementById('actor-gpu').value=p.a;document.getElementById('clip-gpu').value=p.c;document.getElementById('wm-gpu').value=p.w;renderGPU();}
+}
+async function refreshGPU(){
+    try{const r=await fetch('/api/gpu-info');const d=await r.json();if(!d.gpus.length)return;
+    d.gpus.forEach(g=>{const card=document.querySelectorAll('.gpu-card')[g.id];if(card){const pct=Math.round(g.memory_used/g.memory_total*100);card.querySelector('.gpu-bar-fill').style.width=pct+'%';card.querySelector('.gpu-model').textContent=`${g.memory_used}/${g.memory_total}MB`;}});
+    }catch(e){}
+}
+function unlockSettings(){if(document.getElementById('settings-pw').value==='eros2026')document.getElementById('settings-lock').style.display='none';}
+function renderDAG(active){
+    const dag=document.getElementById('dag');
+    dag.innerHTML='';
+    STEPS.forEach((s,i)=>{
+        const cls=active===undefined?'pending':i<active?'done':i===active?'active':'pending';
+        const icon=cls==='done'?'&#10003;':cls==='active'?'&#10227;':String(i+1);
+        dag.innerHTML+=`<div class="dag-node ${cls}"><div class="dag-icon">${icon}</div><div class="dag-name">${s}</div></div>`;
+        if(i<STEPS.length-1) dag.innerHTML+='<span class="dag-arrow">&rarr;</span>';
+    });
+}
+function buildConfig(){
+    return {
+        work_dir:document.getElementById('work-dir').value,
+        model_path:document.getElementById('model-path').value,
+        video_dirs:[...document.querySelectorAll('.vdir')].map(i=>i.value).filter(v=>v),
+        extra_image_dirs:[...document.querySelectorAll('#img-dirs tr')].map(tr=>({path:tr.querySelector('.idir-path')?.value||'',source_type:tr.querySelector('.idir-type')?.value||'internal'})).filter(d=>d.path),
+        streaming:true, vllm_port:8100,
+        vllm_gpu_ids:document.getElementById('vllm-gpus').value.split(',').map(Number),
+        actor_tag_gpu_id:parseInt(document.getElementById('actor-gpu').value),
+        clip_gpu_id:parseInt(document.getElementById('clip-gpu').value),
+        gdino_gpu_id:parseInt(document.getElementById('clip-gpu').value)+1,
+        watermark_gpu_id:parseInt(document.getElementById('wm-gpu').value),
+        vllm_max_concurrent:128, micro_batch_size:500, clip_batch_size:64,
+        scene_threshold:parseFloat(document.getElementById('s-scene').value),
+        frames_per_scene:parseInt(document.getElementById('s-fps').value),
+        phash_intra_threshold:parseInt(document.getElementById('s-dedup-i').value),
+        phash_cross_threshold:parseInt(document.getElementById('s-dedup-c').value),
+        watermark_enabled:document.getElementById('s-wm-on').checked,
+        watermark_detect_threshold:parseFloat(document.getElementById('s-wm-det').value),
+        watermark_reject_threshold:0.9,
+        crop_letterbox:document.getElementById('s-crop').checked,
+        clip_weight:parseFloat(document.getElementById('s-clip-w').value),
+        icr_weight:0.0,
+        aod_weight:parseFloat(document.getElementById('s-aod-w').value),
+        gate_final:parseFloat(document.getElementById('s-gate-f').value),
+        gate_review:parseFloat(document.getElementById('s-gate-r').value),
+        tag_actors_enabled:document.getElementById('s-actors').checked,
+        actor_similarity_threshold:parseFloat(document.getElementById('s-actor-sim').value),
+    };
+}
+function showPreview(){
+    const cfg=buildConfig();const body=document.getElementById('preview-body');let html='';
+    const row=(label,value,cls)=>`<div class="preview-row"><span class="label">${label}</span><span class="value ${cls}">${value}</span></div>`;
+    let errors=0;const vids=cfg.video_dirs.length;const imgs=cfg.extra_image_dirs.length;
+    html+='<h4 style="color:var(--text);margin-bottom:8px">Input Sources</h4>';
+    if(!vids&&!imgs){html+=row('Input','No video or image sources provided!','err');errors++;}
+    else{if(vids)html+=row('Video Folders',`${vids} folder(s)`,'ok');if(imgs)html+=row('Image Datasets',`${imgs} dataset(s)`,'ok');}
+    html+='<h4 style="color:var(--text);margin:16px 0 8px">Output</h4>';
+    if(!cfg.work_dir){html+=row('Output Dir','Not set!','err');errors++;}else html+=row('Output Dir',`<code>${cfg.work_dir}</code>`,'ok');
+    html+=row('Model',`<code>${cfg.model_path}</code>`,cfg.model_path?'ok':'warn');
+    html+='<h4 style="color:var(--text);margin:16px 0 8px">GPU Allocation</h4>';
+    html+=row('vLLM',`GPUs [${cfg.vllm_gpu_ids.join(', ')}] (TP=${cfg.vllm_gpu_ids.length})`,'ok');
+    html+=row('Actor Tagger',`GPU ${cfg.actor_tag_gpu_id}`,'ok');
+    html+=row('CLIP Scorer',`GPU ${cfg.clip_gpu_id}`,'ok');
+    html+=row('Watermark',`GPU ${cfg.watermark_gpu_id}`,cfg.watermark_enabled?'ok':'warn');
+    html+='<h4 style="color:var(--text);margin:16px 0 8px">Settings</h4>';
+    html+=row('Watermark Detection',cfg.watermark_enabled?'Enabled':'Disabled',cfg.watermark_enabled?'ok':'warn');
+    html+=row('Actor Recognition',cfg.tag_actors_enabled?'Enabled':'Disabled','ok');
+    html+=row('Scoring',`CLIP ${cfg.clip_weight} + AOD ${cfg.aod_weight}`,'ok');
+    html+=row('Gate Final &ge;',`${cfg.gate_final}`,'ok');
+    if(errors===0)html+=`<div style="margin-top:16px;padding:10px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);border-radius:8px;color:var(--success);font-size:13px">&check; All checks passed. Ready to start.</div>`;
+    else html+=`<div style="margin-top:16px;padding:10px;background:rgba(255,61,113,0.1);border:1px solid rgba(255,61,113,0.3);border-radius:8px;color:var(--error);font-size:13px">&cross; ${errors} error(s). Fix before starting.</div>`;
+    body.innerHTML=html;document.getElementById('preview-modal').classList.add('open');document.getElementById('btn-confirm').disabled=errors>0;
+}
+function closePreview(){document.getElementById('preview-modal').classList.remove('open');}
+let logSource=null;
+function startPipeline(){showPreview();}
+async function confirmStart(){
+    closePreview();
+    const cfg=buildConfig();
+    document.getElementById('btn-start').disabled=true;document.getElementById('btn-stop').disabled=false;
+    document.getElementById('status-badge').className='status-pill status-running';document.getElementById('status-badge').textContent='RUNNING';
+    document.getElementById('log-box').textContent='';renderDAG(0);
+    nav('run');
+    const resp=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
+    const data=await resp.json();if(data.error){alert(data.error);return;}
+    logSource=new EventSource('/api/logs');
+    const logBox=document.getElementById('log-box');
+    logSource.onmessage=(e)=>{
+        logBox.textContent+=e.data+'\n';logBox.scrollTop=logBox.scrollHeight;
+        const d=e.data;
+        if(d.includes('STEP 1'))renderDAG(0);
+        else if(d.includes('STEP 2'))renderDAG(1);
+        else if(d.includes('STEP 3')||d.includes('Dedup'))renderDAG(2);
+        else if(d.includes('atermark'))renderDAG(3);
+        else if(d.includes('classify'))renderDAG(4);
+        else if(d.includes('tag_actors'))renderDAG(5);
+        else if(d.includes('caption'))renderDAG(6);
+        else if(d.includes('score]'))renderDAG(7);
+        else if(d.includes('xport'))renderDAG(8);
+        else if(d.includes('COMPLETE')){
+            renderDAG(9);
+            document.getElementById('status-badge').className='status-pill status-done';
+            document.getElementById('status-badge').textContent='COMPLETED';
+            document.getElementById('btn-start').disabled=false;document.getElementById('btn-stop').disabled=true;
+            logSource.close();
+            setTimeout(async()=>{await loadResults();nav('results');},1000);
+        }
+    };
+}
+async function stopPipeline(){
+    await fetch('/api/stop',{method:'POST'});if(logSource)logSource.close();
+    document.getElementById('status-badge').className='status-pill status-error';document.getElementById('status-badge').textContent='STOPPED';
+    document.getElementById('btn-start').disabled=false;document.getElementById('btn-stop').disabled=true;
+}
+async function loadResults(){
+    const r=await fetch('/api/results');const d=await r.json();if(d.error)return;
+    const gc=d.gate_counts||{};
+    document.getElementById('result-stats').innerHTML=`
+        <div class="stat"><b>${d.total_scored||0}</b><small>Scored</small></div>
+        <div class="stat"><b>${gc.final||0}</b><small>Final</small></div>
+        <div class="stat"><b>${gc.review||0}</b><small>Review</small></div>
+        <div class="stat"><b>${gc.discard||0}</b><small>Discard</small></div>`;
+}
+renderGPU();renderDAG();
+</script>
+</body>
+</html>

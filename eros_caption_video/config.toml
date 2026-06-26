@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Actor Tagging & Captioning Pipeline
+# Tuned for: 2 × Xeon Platinum 8580 · 3 TiB RAM · NVMe RAID · H200 GPU · K8s
+#
+# SHARED MACHINE SETTINGS (as of 2025-05-26):
+#   Coworkers currently using ~165 / 216 logical cores (Sana training + others).
+#   This config leaves them untouched — pipeline CPU footprint is minimal.
+#
+#   CPU : ffmpeg only (16 workers) + NumPy matmul (8 threads)
+#   GPU : InsightFace face analysis + Gemma captioning  →  both on GPU 6 (H200)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+[paths]
+base_dir             = "/mnt/data0/data0/mouryesh/T2V/eros_cap"
+clip_dir             = "/mnt/data0/data0/mouryesh/T2V/eros_cap/clips_out"
+frames_dir           = "/mnt/data0/data0/mouryesh/T2V/eros_cap/frames_out"
+actor_embeddings_dir = "/mnt/data0/data0/mouryesh/T2V/actor_emd&yaml_gen/actor_embedding"
+input_dir            = "/mnt/data0/data0/movies_new"
+output_dir           = "/mnt/data0/data0/mouryesh/T2V/eros_cap/outputs_29-05"
+
+
+[models]
+insightface_model_pack = "buffalo_l"
+insightface_det_size   = [640, 640]
+
+
+[processing]
+# ── scene detection ──────────────────────────────────────────────────────────
+# Number of parallel chunks. Each chunk runs one PyAV decoder in its own
+# process. 16 workers on your 16-core budget turns ~30 min into ~3 min.
+# Do not exceed your free CPU budget (currently ~16 cores on shared machine).
+scene_workers = 16
+
+# ── ffmpeg ────────────────────────────────────────────────────────────────────
+# 16 workers on a shared machine with ~165/216 cores already occupied.
+# Each ffmpeg call is I/O-bound (~1-5 MB read from NVMe) so 16 is plenty.
+# Raise to 32 only if coworker load drops significantly.
+ffmpeg_workers = 16
+
+# ── face analysis ─────────────────────────────────────────────────────────────
+# Runs entirely on GPU 6 (H200). No CPU workers needed.
+# 16 I/O reader threads feed the GPU session from NVMe — these are
+# lightweight and GIL-free (cv2.imread releases the GIL).
+face_io_threads = 16
+
+# ── captioning ────────────────────────────────────────────────────────────────
+caption_batch_size  = 8
+
+# Internal — do not change
+pos_calc_workers    = 4
+num_frames_per_clip = 3
+
+
+[assignment]
+similarity_threshold = 0.35
+unknown_label        = "unknown"
+
+
+[gpu]
+# Both face analysis and captioning run on GPU 6 (H200, 141 GB HBM3e).
+# GPU 6 is confirmed free based on your original config.
+# Other GPUs (0,1,7) are in use by coworkers — do not touch them.
+use_cuda              = true
+device_id             = [6]       # Gemma captioner
+face_device_id        = [6]       # InsightFace — same GPU, different process phase
+face_sessions_per_gpu = 1         # single session, GPU handles batching internally
+
+
+[captioner]
+model_path    = "/mnt/data0/data0/mouryesh/T2V/actor_tag/gemma-3-4b-it"
+dtype         = "bfloat16"
+batch_size    = 64
+max_model_len = 8192
+max_tokens    = 1000

@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Pipeline outputs
+pipeline_output/
+*.log
+
+# Large model files (download separately)
+models/
+groundingdino/*.pth
+actors/*.pt
+
+# Test artifacts
+test_*/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

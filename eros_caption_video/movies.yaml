@@ -1,0 +1,82 @@
+Bajirao Mastani:
+  frames_subdir: Bajirao Mastani
+  actors:
+  - Ranveer Singh
+  - Vaibhav Tatwawadi
+  - Deepika Padukone
+  - Priyanka Chopra Jonas
+  actor_embedding_files:
+    Ranveer Singh: ranveer_singh.pkl
+    Vaibhav Tatwawadi: vaibhav_tatwawadi.pkl
+    Deepika Padukone: deepika_padukone.pkl
+    Priyanka Chopra Jonas: priyanka_chopra_jonas.pkl
+  actor_display_names:
+    Ranveer Singh: Ranveer Singh
+    Vaibhav Tatwawadi: Vaibhav Tatwawadi
+    Deepika Padukone: Deepika Padukone
+    Priyanka Chopra Jonas: Priyanka Chopra Jonas
+Hum Dil De Chuke Sanam:
+  frames_subdir: Hum Dil De Chuke Sanam
+  actors:
+  - Salman Khan
+  - Ajay Devgn
+  - Aishwarya Rai Bachchan
+  actor_embedding_files:
+    Salman Khan: salman_khan.pkl
+    Ajay Devgn: ajay_devgn.pkl
+    Aishwarya Rai Bachchan: aishwarya_rai_bachchan.pkl
+  actor_display_names:
+    Salman Khan: Salman Khan
+    Ajay Devgn: Ajay Devgn
+    Aishwarya Rai Bachchan: Aishwarya Rai Bachchan
+Ranjhana:
+  frames_subdir: Ranjhana
+  actors:
+  - Dhanush
+  - Abhay Deol
+  - Sonam Kapoor
+  - Swara Bhasker
+  actor_embedding_files:
+    Dhanush: dhanush.pkl
+    Abhay Deol: abhay_deol.pkl
+    Sonam Kapoor: sonam_kapoor.pkl
+    Swara Bhasker: swara_bhasker.pkl
+  actor_display_names:
+    Dhanush: Dhanush
+    Abhay Deol: Abhay Deol
+    Sonam Kapoor: Sonam Kapoor
+    Swara Bhasker: Swara Bhasker
+Ra One:
+  frames_subdir: Ra One
+  actors:
+  - Shah Rukh Khan
+  - Arjun Rampal
+  - Kareena Kapoor Khan
+  - Shahana Goswami
+  actor_embedding_files:
+    Shah Rukh Khan: shah_rukh_khan.pkl
+    Arjun Rampal: arjun_rampal.pkl
+    Kareena Kapoor Khan: kareena_kapoor_khan.pkl
+    Shahana Goswami: shahana_goswami.pkl
+  actor_display_names:
+    Shah Rukh Khan: Shah Rukh Khan
+    Arjun Rampal: Arjun Rampal
+    Kareena Kapoor Khan: Kareena Kapoor Khan
+    Shahana Goswami: Shahana Goswami
+Rockstar:
+  frames_subdir: Rockstar
+  actors:
+  - Ranbir Kapoor
+  - Kumud Mishra
+  - Nargis Fakhri
+  - Aditi Rao Hydari
+  actor_embedding_files:
+    Ranbir Kapoor: ranbir_kapoor.pkl
+    Kumud Mishra: kumud_mishra.pkl
+    Nargis Fakhri: nargis_fakhri.pkl
+    Aditi Rao Hydari: aditi_rao_hydari.pkl
+  actor_display_names:
+    Ranbir Kapoor: Ranbir Kapoor
+    Kumud Mishra: Kumud Mishra
+    Nargis Fakhri: Nargis Fakhri
+    Aditi Rao Hydari: Aditi Rao Hydari

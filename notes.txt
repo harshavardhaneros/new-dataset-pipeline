@@ -1,0 +1,195 @@
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+
+CUDA_VISIBLE_DEVICES=2 python run_pipeline.py \
+  --config pipeline_v2_1gpu.yaml \
+  --movie /mnt/data0/harsha/new_dataset_pipeline/srk_clips/srk_fight_clip.webm \
+  --video-id srk_fight_clip \
+  --force
+
+CUDA_VISIBLE_DEVICES=2 python run_pipeline.py \
+  --config pipeline_v2_1gpu.yaml \
+  --movie /mnt/data0/harsha/new_dataset_pipeline/srk_clips/srk_fight_clip.webm \
+  --video-id srk_fight_clip \
+  --run-dir /mnt/data0/harsha/new_dataset_pipeline/v2_outputs/runs/srk_fight_clip_20260605_115222 \
+  --force
+
+CUDA_VISIBLE_DEVICES=2 python run_pipeline.py \
+  --config pipeline_v2_1gpu.yaml \
+  --movie /path/to/srk_nonfight_clip.webm \
+  --video-id srk_nonfight_clip \
+  --force
+
+
+cd /mnt/data0/harsha/new_dataset_pipeline/v2_outputs/srk_fight_clip/export
+python3 -m http.server 8765
+# http://localhost:8765/clip_review.html
+
+conda activate indic_video_pipeline
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+
+# Reset + models (already done once)
+bash scripts/clean_generated.sh
+bash scripts/setup_all_models.sh
+bash scripts/fix_cuda_torch.sh   # if actor tagging should use GPU 4
+
+# Full pipeline — Devdas
+python run_pipeline.py \
+  --movie /mnt/data0/parth/world_models/HunyuanVideo-Avatar/assets/devdas_standard.mp4 \
+  --video-id devdas_standard \
+  --force
+
+# Actor tagging only
+python run_pipeline.py \
+  --movie /mnt/data0/parth/world_models/HunyuanVideo-Avatar/assets/devdas_standard.mp4 \
+  --video-id devdas_standard \
+  --from-step s1 --to-step s7 --force
+
+
+conda activate indic_video_pipeline
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+
+unset CUDA_VISIBLE_DEVICES
+
+python run_pipeline.py \
+  --movie /mnt/data0/parth/world_models/HunyuanVideo-Avatar/assets/devdas_standard.mp4 \
+  --video-id devdas_standard \
+  --from-step s8 \
+  --to-step s12 \
+  --force
+
+
+
+
+
+
+Here is a quick way to manually verify image + caption for your Devdas run.
+
+1. HTML gallery (recommended)
+From the pipeline code directory:
+
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+python scripts/view_samples.py \
+  --workspace /mnt/data0/harsha/new_dataset_pipeline/pipeline_outputs/workspaces/devdas_standard \
+  -n 8 --tagged-only
+Open the generated file in a browser:
+
+/mnt/data0/harsha/new_dataset_pipeline/pipeline_outputs/workspaces/devdas_standard/sample_review.html
+
+Pick specific clips:
+
+python scripts/view_samples.py \
+  --workspace /mnt/data0/harsha/new_dataset_pipeline/pipeline_outputs/workspaces/devdas_standard \
+  --clip-ids devdas_standard_000000 devdas_standard_000001 devdas_standard_000002
+Each card shows:
+
+actor_frames/{clip_id}.jpg — the frame s7/s8 used (with face tags)
+Caption — normalized from list/string via caption_to_str
+Timestamps, route, actor names
+2. Jupyter / notebook (one clip at a time)
+import json
+from pathlib import Path
+from IPython.display import Image, display, Markdown
+# Add pipeline root if caption_to_str import fails:
+# import sys; sys.path.insert(0, "/mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline")
+from common.caption_text import caption_to_str
+ws = Path("/mnt/data0/harsha/new_dataset_pipeline/pipeline_outputs/workspaces/devdas_standard")
+clip_id = "devdas_standard_000001"
+rec = next(json.loads(l) for l in ws.joinpath("metadata.jsonl").open() if clip_id in l)
+img = ws / "actor_frames" / f"{clip_id}.jpg"
+display(Image(filename=str(img), width=900))
+actors = ", ".join(a["display_name"] for a in rec.get("actors", []))
+display(Markdown(f"**{clip_id}** | {rec['timestamp_start']:.1f}s–{rec['timestamp_end']:.1f}s | {actors}\n\n{caption_to_str(rec['caption'])}")
+3. Terminal-only (text check, no image)
+python3 <<'PY'
+import json
+from pathlib import Path
+sys_path = "/mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline"
+import sys; sys.path.insert(0, sys_path)
+from common.caption_text import caption_to_str
+ws = Path("/mnt/data0/harsha/new_dataset_pipeline/pipeline_outputs/workspaces/devdas_standard")
+for line in ws.joinpath("metadata.jsonl").open():
+    r = json.loads(line)
+    if r.get("verdict") != "FINAL" or not r.get("caption"):
+        continue
+    img = ws / "actor_frames" / f"{r['clip_id']}.jpg"
+    actors = [a.get("display_name") for a in r.get("actors", [])]
+    print("=" * 60)
+    print(r["clip_id"], img.exists(), actors)
+    print(caption_to_str(r["caption"])[:500])
+    break  # remove break to dump all
+PY
+Mapping: metadata.jsonl row → actor_frames/<clip_id>.jpg is the paired image for caption review. Captions can be a list of paragraphs (e.g. devdas_standard_000000); the viewer joins them into one string for reading.
+
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+python run_pipeline.py \
+  --config pipeline_v2.yaml \
+  --movie /mnt/data0/parth/world_models/HunyuanVideo-Avatar/assets/devdas_standard.mp4 \
+  --video-id devdas_standard \
+  --from-step s7 \
+  --to-step s12 \
+  --force
+
+
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+
+CUDA_VISIBLE_DEVICES=2 python run_pipeline.py \
+  --config pipeline_v2_1gpu.yaml \
+  --movie /mnt/data0/harsha/new_dataset_pipeline/srk_clips/srk_fight_clip.webm \
+  --video-id srk_fight_clip \
+  --force
+
+
+Each full pipeline run now gets its own timestamped output folder (enabled in pipeline_v2.yaml).
+
+New layout
+v2_outputs/
+  runs/
+    devdas_standard_20260605_120000/
+      run.json              # run metadata
+      workspace/            # all clip outputs (metadata, export, actor_frames, …)
+      logs/s1 … s12/
+      reports/              # runtime JSON, report, runtime_summary.csv
+    ABCD_20260605_143000/
+      workspace/
+      logs/
+      reports/
+Old flat v2_outputs/workspaces/devdas_standard/ is not overwritten on new runs.
+
+Run a new video (new folder auto-created)
+cd /mnt/data0/harsha/new_dataset_pipeline/Indic_video_pipeline
+python run_pipeline.py \
+  --config pipeline_v2.yaml \
+  --movie /path/to/your_movie.mp4 \
+  --video-id your_video_id \
+  --force
+Terminal prints: Run output: /mnt/data0/harsha/new_dataset_pipeline/v2_outputs/runs/your_video_id_YYYYMMDD_HHMMSS
+
+Resume a partial run (e.g. s8)
+Uses the latest run for that video_id:
+
+python run_pipeline.py \
+  --config pipeline_v2.yaml \
+  --movie /path/to/your_movie.mp4 \
+  --video-id your_video_id \
+  --from-step s8 --to-step s12 --force
+Or target a specific run:
+
+python run_pipeline.py \
+  --config pipeline_v2.yaml \
+  --movie /path/to/your_movie.mp4 \
+  --video-id devdas_standard \
+  --run-dir /mnt/data0/harsha/new_dataset_pipeline/v2_outputs/runs/devdas_standard_20260605_120000 \
+  --from-step s8 --force
+Force a new folder even when resuming from s1
+python run_pipeline.py ... --new-run --force
+View clips + captions for a run
+RUN=/mnt/data0/harsha/new_dataset_pipeline/v2_outputs/runs/devdas_standard_20260605_120000
+python scripts/view_clip_review.py --workspace "$RUN/workspace"
+cd "$RUN/workspace/export"
+python3 -m http.server 8765
+# open http://localhost:8765/clip_review.html
+Config (pipeline_v2.yaml)
+isolate_run_outputs: true
+runs_dir: runs
+v1 pipeline.yaml keeps isolate_run_outputs: false for backward compatibility.
+

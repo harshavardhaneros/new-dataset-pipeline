@@ -1,0 +1,63 @@
+scene_detection:
+  threshold: 27
+  min_scene_len: 15
+
+virtual_clips:
+  clip_length_sec: 5
+  # Three frame sample times as fractions of clip length (used by s7/s8)
+  frame_fractions: [0.2, 0.5, 0.8]
+
+crop_detect:
+  sample_seconds: 30
+  random_seed: 42
+
+dedup:
+  hamming_threshold: 8
+
+motion:
+  unimatch_weight: 0.7
+  vmaf_weight: 0.3
+  sample_interval_sec: 0.5
+  use_fixed_bounds: false
+  percentile_low: 10
+  percentile_high: 90
+  min_score_floor: 0.05
+  max_score_ceiling: 0.95
+  min_score: 0.15
+  max_score: 0.80
+
+dover:
+  min_overall_score: 0.60
+
+quality_scoring:
+  # Five samples across 5s clip (seconds ≈ 0.5, 1.5, 2.5, 3.5, 4.5)
+  score_frame_fractions: [0.1, 0.3, 0.5, 0.7, 0.9]
+
+quality_weights:
+  clip_score: 0.25
+  dover_score: 0.30
+  motion_score: 0.20
+  bucket_semantic: 0.15
+  caption_present: 0.10
+
+gate:
+  # Pragmatic s9 fusion scores lower than legacy ICR/AOD placeholders (~0.25–0.55 typical)
+  discard_below: 0.10
+  review_below: 0.18
+
+caption_verify:
+  min_score: 4   # VCInspector 1–5 scale; >=4 considered accurate
+
+watermark:
+  sample_clips: 5
+  corner_threshold: 0.6
+  corner_std_threshold: 40
+  delogo:
+    x: 12
+    y: 10
+    w: 140
+    h: 58
+
+s4:
+  backend: vllm
+  max_tokens: 128

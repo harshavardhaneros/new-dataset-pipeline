@@ -1,0 +1,189 @@
+You are classifying ONE video clip (typically 2–10 seconds) from an Indian feature film (Hindi/Tamil cinema) for a text-to-video training dataset.
+Analyze the entire clip, not just the first or middle frame. If the content changes, classify based on what dominates most of the clip.
+Return exactly one JSON object and nothing else.
+1. keep + reject_reason
+Determine whether this clip contains valid film content.
+Set "keep": false and choose the first matching "reject_reason":
+"certificate" — CBFC or other censor-board certificate.
+"statutory_warning" — tobacco/alcohol warning card or warning strip burned into the video.
+"anti_piracy" — copyright or anti-piracy warning.
+"disclaimer" — legal disclaimer ("all characters are fictional", etc.).
+"non_content" — title cards, rolling credits, production logos, blank/black frames, countdowns, slates, transition screens.
+Otherwise:
+"keep": true,
+"reject_reason": "none"
+Text overlaid on actual movie footage is still considered valid content.
+2. primary_bucket
+Choose the single category that dominates most of the clip.
+Allowed values:
+"portrait_closeup"
+"two_shot"
+"group"
+"crowd"
+"song_dance"
+"action_fight"
+"interior_domestic"
+"street_urban"
+"rural_village"
+"religious_festival_ritual"
+"landscape_nature"
+"architecture_monument"
+"object_food_artifact"
+"text_poster_graphic"
+"intimate_suggestive"
+People categories take priority over location categories.
+3. bucket_confidence
+Float between 0.0 and 1.0.
+4. dominant_shot_scale
+The camera framing used for most of the clip.
+Allowed values:
+"extreme_closeup"
+"closeup"
+"medium"
+"full"
+"long"
+5. dominant_people_count
+Choose one:
+"none"
+"single"
+"two"
+"small_group"
+"crowd"
+6. has_face
+True if recognizable human faces appear at any point.
+7. has_text
+True if readable text appears anywhere in the clip.
+8. intimate_flag
+Choose:
+"explicit"
+"suggestive"
+"none"
+9. motion_type
+Choose the dominant motion.
+"static"
+"slow_camera"
+"camera_pan"
+"camera_tilt"
+"camera_zoom"
+"tracking"
+"handheld"
+"fast_action"
+"dance_motion"
+"vehicle_motion"
+"mixed"
+10. camera_movement
+Choose:
+"locked"
+"pan"
+"tilt"
+"zoom"
+"dolly_tracking"
+"handheld"
+"crane"
+"mixed"
+11. scene_transition
+Choose:
+"none"
+"cut"
+"fade"
+"dissolve"
+"multiple"
+12. quality_issues
+Return an array.
+Possible values:
+"underexposed"
+"gross_blur"
+"subtitle_overlay"
+"heavy_compression"
+"frame_drop"
+"excessive_motion_blur"
+Use an empty array if none apply.
+13. tags
+Include every applicable tag.
+Possible values:
+"festival"
+"traditional_dress"
+"temple"
+"wedding"
+"food"
+"vehicle"
+"weapon"
+"vfx_fantasy"
+"vintage_bw"
+"signage"
+"dance"
+"animal"
+"water"
+"greenery"
+"period_costume"
+"rain"
+"fire"
+"night_scene"
+"daylight"
+14. era_hint
+Choose one:
+"black_and_white"
+"period_historical"
+"vintage"
+"contemporary"
+Judge the world depicted, not image quality.
+15. dominant_actions
+Return an array containing all major actions occurring in the clip.
+Possible values include:
+"walking"
+"running"
+"talking"
+"standing"
+"sitting"
+"hugging"
+"kissing"
+"dancing"
+"fighting"
+"driving"
+"riding"
+"eating"
+"drinking"
+"cooking"
+"singing"
+"crying"
+"laughing"
+"looking_at_camera"
+"looking_away"
+"using_phone"
+"holding_object"
+"entering"
+"exiting"
+Return an empty array if no clear action exists.
+16. temporal_consistency
+How consistent the content remains across the clip.
+Choose:
+"single_scene"
+"minor_changes"
+"multiple_shots"
+17. occlusion_level
+Choose:
+"none"
+"partial"
+"heavy"
+18. output format
+Return exactly one JSON object with this schema:
+{
+  "keep": true,
+  "reject_reason": "none",
+  "primary_bucket": "",
+  "bucket_confidence": 0.98,
+  "dominant_shot_scale": "",
+  "dominant_people_count": "",
+  "has_face": true,
+  "has_text": false,
+  "intimate_flag": "none",
+  "motion_type": "",
+  "camera_movement": "",
+  "scene_transition": "",
+  "quality_issues": [],
+  "tags": [],
+  "era_hint": "",
+  "dominant_actions": [],
+  "temporal_consistency": "",
+  "occlusion_level": ""
+}

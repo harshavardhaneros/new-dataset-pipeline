@@ -1,0 +1,137 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#  Indic Cultural Image Dataset Pipeline — Master Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+#  Usage:
+#    python3 pipeline.py --config pipeline_config.yaml --streaming
+#    python3 pipeline.py --config pipeline_config.yaml --step classify
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── Input Sources ─────────────────────────────────────────────────────────────
+
+work_dir: /data/kl_dev/runs/run_01
+# movie_list: /path/to/movies.csv          # CSV with columns: path, source_type
+video_dirs:
+  - /eos/youtube_videos/festivals
+  - /eos/youtube_videos/food
+  - /eos/youtube_videos/travel
+extra_image_dirs:
+  - path: /data/kl_dev/dataset/indian_cultural
+    source_type: internal
+
+# ── Model ─────────────────────────────────────────────────────────────────────
+
+model_path: /data/kl_dev/models/Qwen2.5-VL-32B-Instruct
+backend: vllm
+max_new_tokens: 300
+
+# ── GPU Allocation ────────────────────────────────────────────────────────────
+#
+#  Adjust these based on your GPU setup:
+#
+#  8× H100 (default):
+#    GPUs 0-3: vLLM (TP=4)   — classify + caption
+#    GPU 4:    Actor tagger   — YOLO face + InsightFace
+#    GPU 5:    CLIP scorer #1
+#    GPU 6:    CLIP scorer #2 (used when icr_weight=0)
+#    GPU 7:    Watermark      — YOLO detect + LaMA inpaint
+#
+#  4× GPU (smaller setup):
+#    vllm_gpu_ids: [0, 1]     — TP=2
+#    actor_tag_gpu_id: 2
+#    clip_gpu_id: 3
+#    gdino_gpu_id: 3          — shared with CLIP
+#    watermark_gpu_id: 3      — shared
+#
+#  2× GPU (minimal):
+#    vllm_gpu_ids: [0]        — TP=1
+#    actor_tag_gpu_id: 1
+#    clip_gpu_id: 1
+#    gdino_gpu_id: 1
+#    watermark_gpu_id: 1
+
+vllm_gpu_ids:
+  - 0
+  - 1
+  - 2
+  - 3
+actor_tag_gpu_id: 4
+clip_gpu_id: 5
+gdino_gpu_id: 6              # Also used for CLIP #2 when icr_weight=0
+watermark_gpu_id: 7
+
+# ── Streaming Pipeline Settings ───────────────────────────────────────────────
+
+streaming: true
+vllm_port: 8100
+vllm_max_concurrent: 128     # Max concurrent HTTP requests to vLLM
+micro_batch_size: 500         # Images per micro-batch (reduce for less memory)
+
+# ── Scene Detection ───────────────────────────────────────────────────────────
+
+scene_threshold: 27.0         # PySceneDetect sensitivity (lower = more scenes)
+frames_per_scene: 3           # Frames per scene (at 10%, 50%, 90% positions)
+adaptive_detector: false      # Use AdaptiveDetector instead of ContentDetector
+
+# ── Deduplication ─────────────────────────────────────────────────────────────
+
+phash_intra_threshold: 8      # Hamming distance for intra-video dedup (BK-tree)
+phash_cross_threshold: 6      # Hamming distance for cross-source dedup (BK-tree)
+
+# ── Watermark Handling ────────────────────────────────────────────────────────
+
+watermark_enabled: true
+watermark_detect_threshold: 0.45   # YOLO confidence below this = clean
+watermark_reject_threshold: 0.9    # Above this = too heavy for removal
+crop_letterbox: true               # Auto-crop black borders on video frames
+
+# ── Quality Scoring ───────────────────────────────────────────────────────────
+#
+#  Weights must sum to 1.0
+#  ICR (GroundingDINO) is 0 because it can't ground Indian cultural terms
+#  When icr_weight=0, GPU 6 is used for a second CLIP worker (2x scoring speed)
+
+clip_model: openai/clip-vit-large-patch14
+clip_weight: 0.55
+icr_weight: 0.0               # Set > 0 to enable GroundingDINO ICR scoring
+aod_weight: 0.45
+clip_batch_size: 64            # CLIP inference batch size per GPU
+
+# ── Gate Thresholds ───────────────────────────────────────────────────────────
+#
+#  Lowered for Indian cultural content (CLIP has Western training bias)
+
+gate_final: 0.25              # combined_score >= this → "final" (exported)
+gate_review: 0.15             # combined_score >= this → "review"
+                              # below gate_review → "discard"
+
+# ── Actor Tagging ─────────────────────────────────────────────────────────────
+
+tag_actors_enabled: true
+actor_similarity_threshold: 0.35    # Cosine similarity cutoff for face matching
+# actor_images_dir: actors/actor_images
+# actor_embeddings_dir: actors/actor_embeddings
+# yolo_face_model: actors/yolov12n-face.pt
+
+# ── Caption Mixing ────────────────────────────────────────────────────────────
+#
+#  For specified source types, a deterministic subset uses original .txt
+#  descriptions instead of VLM-generated captions (preserves ground truth labels)
+
+caption_mix_ratio: 0.15
+caption_mix_sources:
+  - triveni
+  - drishtikon
+
+# ── GroundingDINO (ICR) ──────────────────────────────────────────────────────
+#
+#  Only used when icr_weight > 0
+#  These paths are relative to the master/ directory
+
+# gdino_config: groundingdino/GroundingDINO_SwinT_OGC.py
+# gdino_checkpoint: groundingdino/groundingdino_swint_ogc.pth
+
+# ── Processing Control ────────────────────────────────────────────────────────
+
+force: false                  # true = ignore .done markers, reprocess everything
