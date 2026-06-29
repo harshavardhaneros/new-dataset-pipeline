@@ -42,6 +42,71 @@ def _worker_init(pipeline_root: str) -> None:
 _RAY_INIT_FAILED = False
 
 
+def reset_ray_state() -> None:
+    """Clear leftover Ray state before a run starts.
+
+    Kills lingering Ray daemons (gcs_server / raylet / dashboard) and removes
+    stale session dirs so each pipeline run begins with a clean Ray — this
+    prevents the zombie-gcs_server pile-up and startup deadlocks that occur when
+    repeated/previous ray.init() attempts leave half-dead clusters behind.
+    Best-effort: never raises. Node-local — it stops all Ray on this node.
+    """
+    import glob
+    import shutil
+    import subprocess
+    import sys
+
+    # 1) Graceful stop of any local Ray cluster (bounded so it can't hang).
+    ray_bin = os.path.join(os.path.dirname(sys.executable), "ray")
+    if os.path.exists(ray_bin):
+        try:
+            subprocess.run(
+                [ray_bin, "stop", "--force"],
+                timeout=30,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            pass
+
+    # 2) Hard-kill any Ray core processes still lingering.
+    for pattern in (
+        "ray/core/src/ray/gcs/gcs_server",
+        "ray/core/src/ray/raylet/raylet",
+        "ray/dashboard/agent.py",
+        "ray/dashboard/dashboard.py",
+        "ray._private.workers",
+        "ray::",
+    ):
+        try:
+            subprocess.run(
+                ["pkill", "-9", "-f", pattern],
+                timeout=10,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            pass
+
+    # 3) Remove stale Ray session/temp dirs (default + current TMPDIR).
+    temp_roots = ["/tmp/ray"]
+    tmpdir = os.environ.get("TMPDIR")
+    if tmpdir:
+        temp_roots.append(os.path.join(tmpdir, "ray"))
+    for root in temp_roots:
+        for path in glob.glob(os.path.join(root, "session_*")) + [
+            os.path.join(root, "ray_current_cluster")
+        ]:
+            try:
+                if os.path.isdir(path):
+                    shutil.rmtree(path, ignore_errors=True)
+                elif os.path.exists(path):
+                    os.remove(path)
+            except Exception:
+                pass
+    logger.info("reset_ray_state: cleared leftover Ray daemons and session dirs")
+
+
 def init_ray(config: Dict[str, Any]) -> bool:
     """Start Ray if enabled and installed. Returns True when Ray is ready."""
     global _RAY_INIT_FAILED

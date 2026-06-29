@@ -39,7 +39,7 @@ s4:
   caption_model: gemma4
   model_path: /mnt/data0/harsha/new_dataset_pipeline/models/gemma-4-31b-it
   tensor_parallel_size: 1
-  gpu_ids: [0, 1]
+  gpu_ids: [0]
   batch_size: 8
   max_tokens: 128
   drop_text_clips: true   # clips with on-screen text are rejected; s5-s12 skip them
@@ -50,7 +50,7 @@ s5:
   vote_frames: 1
   max_tokens: 128
   tensor_parallel_size: 1
-  gpu_ids: [0, 1]
+  gpu_ids: [0]
   batch_size: 12
   parallel: false
 
@@ -60,7 +60,7 @@ s6:
 ray:
   enabled: true
   num_cpus: 64
-  num_gpus: 2
+  num_gpus: 1
   gpu_actor_fraction: 0.5   # pack 2 small-model actors per 143GB GPU (s2 motion/DOVER, s6 verify)
   parallel_clip_min: 2
   chunk_size: 32
@@ -85,22 +85,22 @@ ray:
 models_overrides:
   vllm:
     batch_size: 4            # sweep: batch size has no effect on actor mis-tagging
-    max_tokens: 768          # dense 180-300 word captions (was 500 -> truncated mid-sentence)
+    max_tokens: 500
     max_model_len: 8192
     num_frames: 16             # sweep: 16 frames ~halves mis-tags vs 32 AND is faster
     max_videos_per_prompt: 1
     tensor_parallel_size: 1     # data-parallel: one Gemma4-dense replica per GPU
-    gpu_ids: [0, 1]
+    gpu_ids: [0]
   unimatch:
     device: cuda:0
   dover:
     device: cuda:0
   clip_model:
     use_placeholder: false
-    gpu_ids: [0, 1]
+    gpu_ids: [0]
   gemma:
     model_path: /mnt/data0/harsha/new_dataset_pipeline/models/gemma-3-4b-it
-    gpu_ids: [0, 1]
+    gpu_ids: [0]
     max_new_tokens: 128
   vcinspector:
     model_path: /mnt/data0/harsha/new_dataset_pipeline/models/VCInspector-7B
@@ -108,13 +108,10 @@ models_overrides:
 captioner:
   caption_model: gemma4_dense
   backend: vllm_video         # native MP4 clips fed to vLLM video modality
-  gpu_ids: [0, 1]
+  gpu_ids: [0]
   tensor_parallel_size: 1
   batch_size: 4            # sweep: no quality penalty, max throughput
-  max_tokens: 768          # dense 180-300 word captions (was 500 -> truncated mid-sentence)
-  temperature: 0.1         # Gemma4-dense caption decoding (s8 only; s4/s5 stay greedy)
-  top_p: 0.9
-  repetition_penalty: 1.05
+  max_tokens: 500
   num_frames: 16           # sweep: best quality + fastest (vs 32)
   caption_all_clips: true
   caption_format: prose
@@ -166,10 +163,10 @@ master_pipeline:
   actor_similarity_margin: 0.10
   actor_caption_min_similarity: 0.35
   actor_caption_min_margin: 0.10
-  classify_gpu_ids: [0, 1]
-  verify_gpu_ids: [0, 1]
+  classify_gpu_ids: [0]
+  verify_gpu_ids: [0]
   actor_tag_gpu_id: 0
-  clip_gpu_ids: [0, 1]
+  clip_gpu_ids: [0]
   caption_backend: vllm_video
   prompts_dir: prompts
   max_new_tokens: 128

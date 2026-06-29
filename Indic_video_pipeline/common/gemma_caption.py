@@ -64,37 +64,61 @@ CAPTION_JSON_SYSTEM_PROMPT = (
     "\"color\":\"\",\"font\":\"\",\"appearance_details\":\"\"}] }"
 )
 
-# Plain-text variant: same eros rules without JSON structure.
+# Plain-text variant: expert captioner with verified-actor ground-truth rules.
+# Static instructions only; the per-clip "Verified actors" list is appended by
+# build_caption_user_text() in the user message.
 CAPTION_PROSE_SYSTEM_PROMPT = (
-    "Write one rich paragraph describing this video clip. Plain text only — "
-    "no JSON, no markdown, no bullet lists, no headings.\n\n"
-    "Rules:\n"
-    "- Be precise and avoid repetition.\n"
-    "- No hallucination. Only visible or strongly implied details.\n"
-    "- Avoid generic phrases (e.g., \"a group of people\").\n"
-    "- For humans, describe from THEIR perspective (not the viewer's).\n"
-    "- Prioritise culturally significant visual elements when present.\n"
-    "- Include actor names and positions while explaining object actions.\n"
-    "- Determine each visible person's gender by looking at the video, and use "
-    "pronouns that match it (he/him for a man, she/her for a woman). Never attach a "
-    "name or pronoun that conflicts with the gender of the person you actually see.\n"
-    "- You are captioning a short VIDEO CLIP (not a single photograph).\n"
-    "- Use all provided sequential frames to infer motion, actions, and camera movement.\n"
-    "- Describe what happens over the full clip, including movement.\n"
-    "- Start directly with the subject or action. Never open with meta phrases like "
-    "\"In the video clip\", \"In this clip\", \"The video shows\", \"This video depicts\", "
-    "\"The clip shows\", or \"The image shows\".\n\n"
-    "Indian Cultural Details (include ONLY if visible):\n"
-    "- attire: women: saree (silk/cotton), half-saree, salwar, blouse color/design,\n"
-    "  embroidery (Zardozi, Chikankari). men: veshti/dhoti, kurta, shirt, traditional wear\n"
-    "- accessories: jhumka, nose ring, choker, chain, bangles, anklets, kundan, bindi/sindoor\n"
-    "- regional_identity: Tamil, Punjabi, Bengali, etc. (ONLY if clearly inferable)\n"
-    "- cultural_context: temple, wedding, ritual, festival, street market, rural/urban India\n"
-    "- architecture_landmarks: gopuram, heritage buildings (if visible)\n"
-    "- food_elements: traditional dishes (if present)\n\n"
-    "Text: mention only clearly visible on-screen text.\n\n"
-    "Cover setting, lighting, mood, composition, camera angle/movement, and visible text "
-    "naturally within the paragraph."
+    "You are an expert video captioning system generating high-quality captions for a "
+    "multimodal AI training dataset.\n\n"
+    "The actor names provided in the user message under \"Verified actors\" have already "
+    "been verified by an upstream actor-tagging system and MUST be treated as ground "
+    "truth.\n\n"
+    "Your task is to generate one detailed, chronologically accurate caption for this "
+    "short (about 5-second) video clip.\n\n"
+    "STRICT RULES\n"
+    "1. Use ONLY the actor names given in the Verified actors list.\n"
+    "2. Never invent, replace, or infer any additional actor names.\n"
+    "3. Never identify any person with a different name.\n"
+    "4. If a visible person is not one of the verified actors, or you are uncertain, refer "
+    "to them as an unidentified person, an unidentified individual, a background person, or "
+    "another person.\n"
+    "5. Never duplicate actor identities. Each verified actor refers to exactly one unique "
+    "person in the clip.\n"
+    "6. Never write captions like \"Ranveer talks to Ranveer.\" or \"Priya stands beside "
+    "Priya.\" If two different people appear, they must have different identifiers.\n"
+    "7. If only one verified actor is present, use that actor's name only for that person "
+    "and refer to everyone else using neutral descriptions.\n"
+    "8. If none of the verified actors are visible, do not use any actor names.\n"
+    "9. Never guess actor names.\n"
+    "10. Never identify celebrities, movie characters, or fictional names beyond the "
+    "verified actor list.\n\n"
+    "CAPTION REQUIREMENTS\n"
+    "Describe only what is directly visible. Cover, when present: the scene and "
+    "environment; all verified actors that are actually visible; appearance and clothing; "
+    "actions; interactions; objects; body posture; gaze direction; movement; camera "
+    "movement; lighting; background; clearly visible on-screen text; and the chronological "
+    "sequence of events across the clip.\n\n"
+    "Determine each visible person's gender by looking at the video and use pronouns that "
+    "match it (he/him for a man, she/her for a woman). Never attach a name or pronoun that "
+    "conflicts with the gender of the person you actually see.\n\n"
+    "Use consistent references throughout: once an actor is introduced, always refer to "
+    "that same person using the same verified name. If multiple unnamed people are present, "
+    "distinguish them with descriptions such as \"the unidentified person in a white "
+    "shirt\", \"the background individual near the doorway\", or \"another person standing "
+    "on the left\".\n\n"
+    "Indian cultural details (include ONLY if clearly visible):\n"
+    "- attire: women: saree (silk/cotton), half-saree, salwar, blouse colour/design, "
+    "embroidery (Zardozi, Chikankari); men: veshti/dhoti, kurta, shirt, traditional wear\n"
+    "- accessories: jhumka, nose ring, choker, chain, bangles, anklets, kundan, "
+    "bindi/sindoor\n"
+    "- cultural context: temple, wedding, ritual, festival, street market, rural/urban "
+    "India; architecture: gopuram, heritage buildings; food: traditional dishes\n\n"
+    "Never infer relationships, professions, emotions, intentions, story context, or events "
+    "outside this clip.\n\n"
+    "Write one coherent paragraph of 180-300 words in plain text only - no JSON, markdown, "
+    "bullet lists, or headings. Start directly with the subject or action; do not open with "
+    "meta phrases like \"In the video clip\", \"The video shows\", or \"This clip "
+    "depicts\". Return only the caption."
 )
 
 # Backward-compatible alias (JSON is the default structured format).
@@ -299,44 +323,32 @@ def build_caption_user_text(
         times = ", ".join(f"{t:.1f}s" for t in offsets[:3])
         lines.append(
             f"Sequential frames span {dur:g} seconds (at {times}). "
-            "Describe the full clip including movement and camera work."
+            "Describe the full clip in chronological order, including movement and camera work."
         )
-    if len(clip_actors) >= 2:
+    if clip_actors:
         located = []
         for name in clip_actors:
             pos = _actor_position_phrase(rec, name)
             g = _actor_gender_word(rec, name)
-            parts = ", ".join(p for p in (f"a {g}" if g else "", pos) if p)
-            located.append(f"{name} ({parts})" if parts else name)
+            desc = ", ".join(p for p in (f"a {g}" if g else "", pos) if p)
+            located.append(f"- {name}: {desc}" if desc else f"- {name}")
         lines.append(
-            f"Identified cast in this clip: {', '.join(located)}. "
-            "Use each named person's full name ONLY for the person at their stated "
-            "location whose visible gender matches the one given. Look at the video and "
-            "use pronouns that match each person's visible gender (he/him, she/her). "
-            "Any other visible people are NOT in this cast — call them "
-            "'another man' or 'another woman' by their visible gender, and never reuse a "
-            "cast member's name (or attach a mismatched-gender pronoun) for someone else. "
-            "Do not write 'the man'/'the woman' for a named cast member."
+            "Verified actors (ground truth - use these exact names, each for exactly one "
+            "person):\n" + "\n".join(located)
         )
-    elif len(clip_actors) == 1:
-        name = clip_actors[0]
-        pos = _actor_position_phrase(rec, name)
-        g = _actor_gender_word(rec, name)
-        desc = f", a {g}" if g else ""
-        where = f" {name} is the {g or 'person'} {pos}." if pos else ""
-        gp = g or "person"
         lines.append(
-            f"Identified person: {name}{desc}.{where} "
-            f"Use the name {name} ONLY for that one {gp}; look at the video and use "
-            f"pronouns matching {name}'s visible gender. "
-            "Any other people visible are different individuals — call them "
-            "'another man' or 'another woman' by their visible gender, and NEVER use "
-            f"{name}'s name (or a mismatched-gender pronoun) for anyone else, even if "
-            "they look similar. "
-            f"Use {name}'s full name for the identified person (not 'the man'/'the woman')."
+            "Use each verified name ONLY for that one person (matching the stated gender and "
+            "location). Refer to every other visible person with a neutral description (an "
+            "unidentified person, another man, another woman) by their visible gender. Never "
+            "reuse a verified name for two people, and never attach a name or pronoun that "
+            "conflicts with a person's visible gender."
         )
     else:
-        lines.append("Describe the people, setting, and action visible across the frames.")
+        lines.append(
+            "No verified actors in this clip. Do not use any actor or character names; refer "
+            "to every person with a neutral description (an unidentified person, a man, a "
+            "woman, the person in the white shirt)."
+        )
     return "\n".join(lines)
 
 

@@ -184,6 +184,9 @@ class _VLLMReplica:
         input_modality: str = "image",
         num_frames: int = 32,
         max_videos: int = 1,
+        sampling_temperature: float = 0.0,
+        sampling_top_p: float = 1.0,
+        sampling_repetition_penalty: float = 1.0,
     ):
         self.model_path = model_path
         self.gpu_ids = gpu_ids
@@ -195,8 +198,22 @@ class _VLLMReplica:
         self.input_modality = input_modality
         self.num_frames = num_frames
         self.max_videos = max_videos
+        # Decoding params. Defaults = greedy (temp 0) so s4 text-detect / s5
+        # classify stay deterministic; s8 caption overrides these from config.
+        self.sampling_temperature = sampling_temperature
+        self.sampling_top_p = sampling_top_p
+        self.sampling_repetition_penalty = sampling_repetition_penalty
         self._llm = None
         self._processor = None
+
+    def _sampling_kwargs(self) -> Dict[str, Any]:
+        """SamplingParams kwargs for the main (non-re-roll) generate pass."""
+        kw: Dict[str, Any] = {"temperature": self.sampling_temperature}
+        if self.sampling_temperature > 0:
+            kw["top_p"] = self.sampling_top_p
+        if self.sampling_repetition_penalty and self.sampling_repetition_penalty != 1.0:
+            kw["repetition_penalty"] = self.sampling_repetition_penalty
+        return kw
 
     def load(self) -> None:
         if self._llm is not None:
@@ -329,8 +346,8 @@ class _VLLMReplica:
 
         self.load()
         sampling = SamplingParams(
-            temperature=0,
             max_tokens=max_tokens or self.max_tokens,
+            **self._sampling_kwargs(),
         )
         prompts = []
         for item in items:
@@ -377,11 +394,15 @@ class _VLLMReplica:
 
         self.load()
         prompt = self._build_video_prompt(clip_path, text)
-        sampling = SamplingParams(
-            n=max(1, n),
-            temperature=max(0.01, temperature),
-            max_tokens=max_tokens or self.max_tokens,
-        )
+        rr_kwargs: Dict[str, Any] = {
+            "n": max(1, n),
+            "temperature": max(0.01, temperature),
+            "top_p": self.sampling_top_p,
+            "max_tokens": max_tokens or self.max_tokens,
+        }
+        if self.sampling_repetition_penalty and self.sampling_repetition_penalty != 1.0:
+            rr_kwargs["repetition_penalty"] = self.sampling_repetition_penalty
+        sampling = SamplingParams(**rr_kwargs)
         outputs = self._llm.generate([prompt], sampling)
         return [o.text.strip() for o in outputs[0].outputs]
 
@@ -464,6 +485,17 @@ class QwenVLLMEngine:
                 cap.get("batch_size", vllm_cfg.get("batch_size", 16))
             )
 
+        # Decoding params: s4 text-detect and s5 classify must stay greedy
+        # (deterministic JSON); s8 caption uses sampled decoding for richer prose.
+        if stage in ("s4", "s5"):
+            self.sampling_temperature = 0.0
+            self.sampling_top_p = 1.0
+            self.sampling_repetition_penalty = 1.0
+        else:
+            self.sampling_temperature = float(cap.get("temperature", 0.1))
+            self.sampling_top_p = float(cap.get("top_p", 0.9))
+            self.sampling_repetition_penalty = float(cap.get("repetition_penalty", 1.05))
+
         self.gpu_ids = resolve_gpu_ids(gpu_ids)
         if not self.gpu_ids:
             raise RuntimeError(
@@ -540,6 +572,9 @@ class QwenVLLMEngine:
                 input_modality=self.input_modality,
                 num_frames=self.num_frames,
                 max_videos=self.max_videos,
+                sampling_temperature=self.sampling_temperature,
+                sampling_top_p=self.sampling_top_p,
+                sampling_repetition_penalty=self.sampling_repetition_penalty,
             )
             replica.load()
             self._replicas.append(replica)

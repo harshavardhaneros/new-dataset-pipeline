@@ -273,6 +273,15 @@ def main() -> int:
     config = load_config(root, args.config)
     if args.outputs_root:
         config["pipeline"]["outputs_root"] = args.outputs_root
+
+    # Start every run with a clean Ray state: kill leftover daemons + stale
+    # session dirs so a previous failed/zombie cluster can't block or deadlock
+    # this run. Only when Ray is enabled for this config.
+    from common.ray_pool import ray_enabled, reset_ray_state
+
+    if ray_enabled(config):
+        reset_ray_state()
+
     service_order = config["pipeline"].get("services_order", list(SERVICE_MODULES.keys()))
     out = outputs_root(config)
     if not run_output_enabled(config):
